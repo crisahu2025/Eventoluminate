@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="es" class="dark">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1" />
+    <title>¡Registro Exitoso! - EVENTO LUMINATE</title>
+    <link rel="icon" type="image/png" href="favicon.png" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #0f172a;
+            --card: #1e293b;
+            --primary: #a855f7;
+            --accent: #facc15;
+            --text: #f8fafc;
+            --muted: #94a3b8;
+            --border: #334155;
+            --green: #10b981;
+            --green-bg: rgba(16, 185, 129, 0.1);
+            --radius: 24px;
+            --font-heading: 'Orbitron', sans-serif;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        body, h1, h2, p, span, strong, div {
+            font-family: 'Orbitron', sans-serif !important;
+        }
+
+        .card {
+            max-width: 550px;
+            width: 100%;
+            background: var(--card);
+            border: 1px solid var(--border);
+            padding: 48px 32px;
+            border-radius: var(--radius);
+            text-align: center;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.05);
+            animation: slideUp 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .success-icon {
+            width: 90px;
+            height: 90px;
+            background: var(--green-bg);
+            color: var(--green);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 24px;
+            font-size: 44px;
+            border: 2px solid var(--green);
+            box-shadow: 0 0 20px rgba(5, 150, 105, 0.2);
+        }
+
+        h1 {
+            font-size: 24px;
+            font-weight: 900;
+            color: var(--primary);
+            margin-bottom: 12px;
+            letter-spacing: 1px;
+        }
+
+        .highlight-text {
+            color: var(--accent);
+            font-weight: 800;
+        }
+
+        .subtitle {
+            color: var(--muted);
+            font-size: 15px;
+            margin-bottom: 32px;
+            line-height: 1.6;
+        }
+
+        .summary-box {
+            background: rgba(255, 255, 255, 0.03);
+            border: 2px solid var(--border);
+            border-radius: 20px;
+            padding: 24px;
+            text-align: left;
+            margin-bottom: 32px;
+        }
+
+        .summary-title {
+            font-size: 12px;
+            font-weight: 800;
+            color: var(--muted);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .summary-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+
+        .summary-divider {
+            height: 1px;
+            background: var(--border);
+            margin: 16px 0;
+            border: none;
+        }
+
+        .attendees-list {
+            margin-top: 16px;
+        }
+
+        .attendee-item {
+            font-size: 13px;
+            padding: 4px 0;
+            display: flex;
+            gap: 8px;
+            color: var(--text);
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            padding: 18px;
+            background: var(--primary);
+            color: white;
+            border-radius: 14px;
+            text-decoration: none;
+            font-weight: 700;
+            font-size: 16px;
+            transition: all 0.2s;
+            border: none;
+            cursor: pointer;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(6, 95, 70, 0.2);
+        }
+
+        .whatsapp-link {
+            display: block;
+            margin-top: 24px;
+            color: var(--muted);
+            font-size: 13px;
+            text-decoration: underline;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="card">
+        <div class="success-icon">✓</div>
+        <h1>¡REGISTRO EXITOSO!</h1>
+        <p class="subtitle">
+            Tu pago se <span class="highlight-text">acreditó correctamente</span> y ya estás anotado para 
+            <strong>EVENTO LUMINATE</strong>.
+        </p>
+
+        <div class="summary-box" id="summary">
+            <div class="summary-title"><span>📋</span> Resumen de Inscripción</div>
+            <div id="summaryContent">
+                <!-- Se llena con JS -->
+                <p style="font-size:12px; color:var(--muted)">Cargando detalles...</p>
+            </div>
+        </div>
+
+        <a href="index.html" class="btn" onclick="clearSession()">
+            Volver al Inicio 🏠
+        </a>
+
+        <a href="https://wa.me/5493364333287" target="_blank" class="whatsapp-link">
+            ¿Tenés alguna duda? Hablanos por WhatsApp
+        </a>
+    </div>
+
+    <script>
+        function init() {
+            const raw = localStorage.getItem("ticketflow_purchase");
+            if (!raw) {
+                document.getElementById("summaryContent").innerHTML = "<p>No se encontraron datos recientes.</p>";
+                return;
+            }
+
+            const p = JSON.parse(raw);
+            const content = document.getElementById("summaryContent");
+
+            let attendeesHtml = p.names.map((n, i) => 
+                `<div class="attendee-item"><strong>${i+1}.</strong> ${n}</div>`
+            ).join("");
+
+            let qtyText = [];
+            if (p.quantities && p.quantities.individual > 0) qtyText.push(`${p.quantities.individual} Individual(es)`);
+            if (p.quantities && p.quantities.matrimonio > 0) qtyText.push(`${p.quantities.matrimonio} Matrimonio(s)`);
+            const quantityDisplay = qtyText.length > 0 ? qtyText.join(" + ") : (p.effectiveQty || "1");
+
+            content.innerHTML = `
+                <div class="summary-row"><span>Entrada:</span> <strong>${p.typeLabel}</strong></div>
+                <div class="summary-row"><span>Cantidad:</span> <strong>${quantityDisplay}</strong></div>
+                <div class="summary-row"><span>Grupo/Iglesia:</span> <strong>${p.city}</strong></div>
+                <div class="summary-divider"></div>
+                <div class="summary-row" style="font-size:18px; color:var(--primary)">
+                    <span>Total Pagado:</span> 
+                    <strong>$${p.totalPrice.toLocaleString("es-AR")}</strong>
+                </div>
+                <div class="attendees-list">
+                    <div class="summary-title" style="font-size:10px; margin-bottom:8px">Asistentes:</div>
+                    ${attendeesHtml}
+                </div>
+            `;
+        }
+
+        function clearSession() {
+            localStorage.removeItem("ticketflow_purchase");
+        }
+
+        // Ejecutar al cargar
+        init();
+    </script>
+</body>
+
+</html>
