@@ -1,0 +1,223 @@
+// ============================================================
+//  SCRIPT PARA: EVENTO LUMINATE
+//  Pegar TODO este contenido en Google Apps Script
+//  y hacer Nueva Implementación (aplicacion web)
+// ============================================================
+
+// --- CONFIGURACIÓN ---
+const ACCESS_TOKEN = "APP_USR-642254579401252-042413-fb72a1d0bbd6e0cc7283484cbc89b6b9-2287565299";
+const SPREADSHEET_ID = "1dCTBmZTsOkgf1evvLCVkvCSWOr_-gYs6yXln1kxTYAM";
+const TELEGRAM_TOKEN = "8077622130:AAG3_18d2g1jV9WCUgLXcrbh0CO4P9v0br4";
+const HOJAS = ["Pago-Online", "Pago-Efectivo"];
+const SECURITY_TOKEN = "GRAN_REY_SECURE_2026";
+
+function VINCULAR_BOT() {
+  const urlApp = ScriptApp.getService().getUrl();
+  if (!urlApp) { Logger.log("ERROR: Primero implementar."); return; }
+  const urlTelegram = `https://api.telegram.org/bot${TELEGRAM_TOKEN}/setWebhook?url=${urlApp}`;
+  const response = UrlFetchApp.fetch(urlTelegram);
+  Logger.log("Respuesta: " + response.getContentText());
+}
+
+function doPost(e) {
+  let activeChatId = null;
+  try {
+    if (!e || !e.postData) return;
+    const contents = JSON.parse(e.postData.contents);
+
+    if (contents.type === "payment" || (contents.action && contents.action.includes("payment"))) {
+      return handleMercadoPagoWebhook(contents);
+    }
+    if (contents.action === "create_preference") {
+      if (contents.token !== SECURITY_TOKEN) {
+        return ContentService.createTextOutput(JSON.stringify({error: "No autorizado"})).setMimeType(ContentService.MimeType.JSON);
+      }
+      return createPreference(contents.data);
+    }
+    if (contents.rows) {
+      if (contents.token !== SECURITY_TOKEN) {
+        return ContentService.createTextOutput("NO_AUTH");
+      }
+      return handleWebRegistration(contents.rows, contents.external_reference);
+    }
+    if (contents.message) {
+      activeChatId = contents.message.chat.id;
+      const text = (contents.message.text || "").toLowerCase().trim();
+      if (text === "hola" || text === "test" || text === "/start") {
+        return sendMessage(activeChatId, "👋 ¡Hola! El bot de EVENTO LUMINATE está listo.\n\nEscribí el NOMBRE de la persona que buscás para entregarle la pulsera.");
+      }
+      if (text === "esteban2025") {
+        return sendMessage(activeChatId, obtenerEstadisticas());
+      }
+      return handleTelegramBot(contents);
+    }
+  } catch (error) {
+    if (activeChatId) sendMessage(activeChatId, "Error: " + error.toString());
+    console.error("Error: " + error.toString());
+  }
+}
+
+// --- MERCADO PAGO ---
+function createPreference(data) {
+  const url = "https://api.mercadopago.com/checkout/preferences";
+  const payload = {
+    items: [{
+      title: "Entrada EVENTO LUMINATE - " + data.typeLabel,
+      quantity: 1,
+      unit_price: data.totalPrice,
+      currency_id: "ARS"
+    }],
+    external_reference: data.external_reference,
+    notification_url: ScriptApp.getService().getUrl(),
+    back_urls: {
+      success: "https://luminate.iglesiagranrey.com/registro-exitoso.html",
+      failure: "https://luminate.iglesiagranrey.com/"
+    },
+    auto_return: "approved"
+  };
+  const options = {
+    method: "post", contentType: "application/json",
+    headers: { Authorization: "Bearer " + ACCESS_TOKEN },
+    payload: JSON.stringify(payload)
+  };
+  const response = UrlFetchApp.fetch(url, options);
+  const prefData = JSON.parse(response.getContentText());
+  return ContentService.createTextOutput(JSON.stringify({ init_point: prefData.init_point, id: prefData.id })).setMimeType(ContentService.MimeType.JSON);
+}
+
+function handleMercadoPagoWebhook(contents) {
+  const paymentId = contents.data ? contents.data.id : contents.id;
+  const url = "https://api.mercadopago.com/v1/payments/" + paymentId;
+  const options = { headers: { Authorization: "Bearer " + ACCESS_TOKEN } };
+  const response = UrlFetchApp.fetch(url, options);
+  const payment = JSON.parse(response.getContentText());
+  if (payment.status === "approved") {
+    confirmPaymentInSheet(payment.external_reference, paymentId);
+  }
+  return ContentService.createTextOutput("OK");
+}
+
+function confirmPaymentInSheet(ref, paymentId) {
+  const sheet = SpreadsheetApp.openById(SPREADSHEET_ID).getSheetByName("Pago-Online");
+  const data = sheet.getDataRange().getValues();
+  for (let i = 1; i < data.length; i++) {
+    if (data[i][11] == ref) {
+      sheet.getRange(i + 1, 6).setValue(paymentId);
+      sheet.getRange(i + 1, 13).setValue("PAGO APROBADO ✅");
+    }
+  }
+}
+
+function handleWebRegistration(rows, externalRef) {
+  const sheet = SpreadsheetApp.openById(SPREADSHEET_ID).getSheetByName("Pago-Online");
+  rows.forEach(row => {
+    sheet.appendRow([row.tipo, row.fecha, row.nombre, row.ciudad, row.monto, "", "NO", "", "", row.pastor || "", "", externalRef]);
+  });
+  return ContentService.createTextOutput("OK");
+}
+
+function obtenerEstadisticas() {
+  const ss = SpreadsheetApp.openById(SPREADSHEET_ID);
+  let totalOnline = 0, totalEfectivo = 0, entregadas = 0;
+  HOJAS.forEach(nombreHoja => {
+    const sheet = ss.getSheetByName(nombreHoja);
+    if (!sheet) return;
+    const data = sheet.getDataRange().getValues();
+    for (let i = 1; i < data.length; i++) {
+      const nombre = String(data[i][2]).trim();
+      const entregado = String(data[i][6]).toLowerCase().trim();
+      if (nombre !== "") {
+        if (nombreHoja === "Pago-Online") totalOnline++;
+        else totalEfectivo++;
+        if (["si", "sí", "se entrega pulsera"].includes(entregado)) entregadas++;
+      }
+    }
+  });
+  return `📊 *Estadísticas EVENTO LUMINATE:*\nAnotados Online: ${totalOnline}\nAnotados Efectivo: ${totalEfectivo}\nTotal Anotados: ${totalOnline + totalEfectivo}\nPulseras entregadas: ${entregadas}`;
+}
+
+function handleTelegramBot(update) {
+  const chatId = update.message.chat.id;
+  const text = (update.message.text || "").trim();
+  const user = update.message.from.first_name || update.message.from.username || "Admin";
+  const estado = obtenerEstado(chatId);
+
+  if (estado.estado === "eligiendo_nombre") {
+    const num = parseInt(text);
+    if (num === 1) {
+      sendMessage(chatId, "Búsqueda cancelada. ¿A quién buscás ahora?");
+      guardarEstado(chatId, { estado: "buscando_nombre" });
+    } else if (num > 1 && num <= estado.resultados.length + 1) {
+      const el = estado.resultados[num - 2];
+      sendMessage(chatId, `👤 Seleccionado: ${el.nombre}\n\n1) Entregar pulsera ✅\n2) Cancelar 🔄`);
+      guardarEstado(chatId, { estado: "menu_pulsera", resultados: [el] });
+    } else sendMessage(chatId, "Elegí un número de la lista.");
+  } else if (estado.estado === "menu_pulsera") {
+    if (text === "1") {
+      const persona = estado.resultados[0];
+      marcarEntrega(persona, user);
+      sendMessage(chatId, "✅ Pulsera entregada.\n\n¡Siguiente!");
+    } else sendMessage(chatId, "Cancelado. ¿A quién buscás?");
+    guardarEstado(chatId, { estado: "buscando_nombre" });
+  } else {
+    const b = buscarNombres(text);
+    if (!b) sendMessage(chatId, `❌ No encontré a "${text}".`);
+    else if (b.sinResultados) sendMessage(chatId, (b.msgEnt || "") + "⚠️ Todos con ese nombre ya tienen su pulsera.");
+    else {
+      sendMessage(chatId, (b.msgEnt || "") + "🔍 Resultados:\n" + b.opciones.join("\n"));
+      guardarEstado(chatId, { estado: "eligiendo_nombre", resultados: b.resultados });
+    }
+  }
+}
+
+function buscarNombres(q) {
+  const res = [], ent = [];
+  q = q.toLowerCase();
+  HOJAS.forEach(h => {
+    const sheet = SpreadsheetApp.openById(SPREADSHEET_ID).getSheetByName(h);
+    if (!sheet) return;
+    const d = sheet.getDataRange().getValues();
+    for (let i = 1; i < d.length; i++) {
+      if (String(d[i][2]).toLowerCase().includes(q)) {
+        if (!["si", "sí", "se entrega pulsera"].includes(String(d[i][6]).toLowerCase())) {
+          res.push({ nombre: d[i][2], hoja: h, fila: i + 1 });
+        } else ent.push(d[i][2]);
+      }
+    }
+  });
+  if (res.length === 0 && ent.length === 0) return null;
+  const msgEnt = ent.length > 0 ? "📦 Ya entregadas: " + ent.join(", ") + "\n\n" : "";
+  if (res.length === 0) return { sinResultados: true, msgEnt };
+  return { resultados: res, msgEnt, opciones: ["1) ❌ Nueva búsqueda", ...res.map((r, i) => `${i + 2}) ${r.nombre}`)] };
+}
+
+function marcarEntrega(r, u) {
+  const s = SpreadsheetApp.openById(SPREADSHEET_ID).getSheetByName(r.hoja);
+  const now = Utilities.formatDate(new Date(), "GMT-3", "dd/MM/yy HH:mm");
+  s.getRange(r.fila, 7).setValue("SI");
+  s.getRange(r.fila, 8).setValue(u);
+  s.getRange(r.fila, 9).setValue(now);
+}
+
+function sendMessage(id, txt) {
+  UrlFetchApp.fetch(`https://api.telegram.org/bot${TELEGRAM_TOKEN}/sendMessage`, {
+    method: "post", contentType: "application/json",
+    payload: JSON.stringify({ chat_id: id, text: txt, parse_mode: "Markdown" })
+  });
+}
+
+function obtenerEstado(id) {
+  const c = CacheService.getScriptCache().get("s" + id);
+  return c ? JSON.parse(c) : { estado: "buscando_nombre" };
+}
+
+function guardarEstado(id, st) {
+  CacheService.getScriptCache().put("s" + id, JSON.stringify(st), 600);
+}
+
+function doGet(e) {
+  if (e.parameter.token !== SECURITY_TOKEN) {
+    return ContentService.createTextOutput("Acceso denegado");
+  }
+  return ContentService.createTextOutput("✅ SCRIPT LUMINATE ONLINE").setMimeType(ContentService.MimeType.TEXT);
+}
