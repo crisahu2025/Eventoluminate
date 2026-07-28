@@ -26,16 +26,18 @@
     }
 
     :root {
-      --bg: #080c18;
-      --card: rgba(12, 20, 40, 0.80);
-      --primary: #22d3ee; /* Cian brillante */
-      --primary-glow: rgba(34, 211, 238, 0.45);
-      --accent: #c084fc; /* Lila suave */
-      --accent-glow: rgba(192, 132, 252, 0.45);
-      --text: #f0f4ff;
-      --muted: #7c8db5;
-      --border: rgba(34, 211, 238, 0.18);
-      --border-hover: #22d3ee;
+      --bg: #1a0f1e;                         /* Fondo oscuro violeta profundo */
+      --card: rgba(30, 15, 40, 0.82);
+      --primary: #ff8c5a;                    /* Naranja melocotón vibrante */
+      --primary-glow: rgba(255, 140, 90, 0.45);
+      --accent: #b07aff;                     /* Violeta/lavanda vivo */
+      --accent-glow: rgba(176, 122, 255, 0.45);
+      --gold: #f5c842;                       /* Dorado de la imagen */
+      --gold-glow: rgba(245, 200, 66, 0.35);
+      --text: #fff5ee;
+      --muted: #c4a88a;
+      --border: rgba(255, 140, 90, 0.20);
+      --border-hover: #ff8c5a;
       --destructive: #f43f5e;
       --mp-blue: #009EE3;
       --mp-blue-hover: #007bbf;
@@ -76,10 +78,10 @@
       inset: 0;
       z-index: 0;
       pointer-events: none;
-      background: url('WhatsApp Image 2026-07-18 at 15.49.17.jpeg') center/cover no-repeat;
-      filter: blur(2px);
-      transform: scale(1.05); /* Evita bordes blancos por el blur */
-      opacity: 0.5;
+      background: url('Luminate Nuevo.jpeg') center/cover no-repeat;
+      filter: blur(3px) saturate(1.2);
+      transform: scale(1.07); /* Evita bordes blancos por el blur */
+      opacity: 0.55;
     }
     
     .bg-overlay {
@@ -87,8 +89,12 @@
       inset: 0;
       z-index: 0;
       pointer-events: none;
-      background: var(--bg);
-      opacity: 0.85; /* Asegura buena legibilidad del texto */
+      background: linear-gradient(
+        160deg,
+        rgba(26, 15, 30, 0.88) 0%,
+        rgba(40, 15, 20, 0.82) 40%,
+        rgba(20, 10, 35, 0.88) 100%
+      );
     }
 
     .container {
@@ -112,9 +118,9 @@
       border-radius: 999px;
       font-size: 13px;
       font-weight: 600;
-      background: rgba(124, 58, 237, 0.1);
+      background: rgba(255, 140, 90, 0.12);
       color: var(--primary);
-      border: 1px solid rgba(124, 58, 237, 0.2);
+      border: 1px solid rgba(255, 140, 90, 0.30);
       backdrop-filter: blur(8px);
       margin-bottom: 16px;
       letter-spacing: 1px;
@@ -125,7 +131,7 @@
       font-size: clamp(30px, 6vw, 60px);
       font-weight: 700;
       color: #ffffff;
-      text-shadow: 0 0 30px var(--primary-glow), 0 0 60px var(--accent-glow);
+      text-shadow: 0 0 30px var(--primary-glow), 0 0 60px var(--accent-glow), 0 0 80px var(--gold-glow);
       letter-spacing: 8px;
       text-transform: uppercase;
       line-height: 1.1;
@@ -161,7 +167,7 @@
 
     .progress-fill {
       height: 100%;
-      background: linear-gradient(90deg, var(--primary), var(--accent));
+      background: linear-gradient(90deg, var(--primary), var(--gold), var(--accent));
       box-shadow: 0 0 15px var(--primary-glow);
       transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
     }
@@ -255,8 +261,8 @@
 
     .ticket-card.selected {
       border-color: var(--primary);
-      background: rgba(6, 182, 212, 0.1);
-      box-shadow: 0 0 30px var(--primary-glow), inset 0 0 20px rgba(6, 182, 212, 0.1);
+      background: rgba(255, 140, 90, 0.12);
+      box-shadow: 0 0 30px var(--primary-glow), inset 0 0 20px rgba(255, 140, 90, 0.08);
     }
 
     .ticket-icon {
@@ -446,13 +452,13 @@
     }
 
     .btn-primary {
-      background: linear-gradient(135deg, var(--primary), var(--accent));
+      background: linear-gradient(135deg, var(--primary), var(--gold), var(--accent));
       color: white;
       box-shadow: 0 4px 15px var(--primary-glow);
     }
 
     .btn-primary:hover {
-      box-shadow: 0 8px 25px var(--primary-glow), 0 8px 25px var(--accent-glow);
+      box-shadow: 0 8px 25px var(--primary-glow), 0 8px 25px var(--accent-glow), 0 4px 20px var(--gold-glow);
       transform: translateY(-2px);
     }
 
