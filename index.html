@@ -881,27 +881,6 @@
       matrimonio: { label: "Matrimonio", price: 70000, maxQty: 5, promo: false },
     };
 
-    const INDIVIDUAL_LINKS = {
-      1: "https://mpago.la/1aqR7n8",
-      2: "https://mpago.la/2KNHsVG",
-      3: "https://mpago.la/1tWo9B3",
-      4: "https://mpago.la/2U2PLye",
-      5: "https://mpago.la/1EQV4U5",
-    };
-    const MATRIMONIO_LINK = "https://mpago.la/1s2o6kf";
-    const EXTENSIONES_LINKS = {
-      1: "https://mpago.la/2U8LpvC",
-      2: "https://mpago.la/2JYJ3HF",
-      3: "https://mpago.la/1r2AXU5",
-      4: "https://mpago.la/1mJQTCm",
-      5: "https://mpago.la/26ip1Rk",
-      6: "https://mpago.la/1cpu3aP",
-      7: "https://mpago.la/2HTp2jb",
-      8: "https://mpago.la/1inKMbQ",
-      9: "https://mpago.la/1U8WMTQ",
-      10: "https://mpago.la/2xydo8y",
-    };
-
     // ===== STATE =====
     let quantities = { individual: 0, matrimonio: 0 };
     let activeType = "individual";
@@ -1180,10 +1159,13 @@
     }
 
     function resetAll() {
-      selectedType = "individual";
-      quantity = 1;
+      quantities = { individual: 0, matrimonio: 0 };
       formData = null;
       document.getElementById("cityInput").value = "";
+      document.getElementById("pastorInput").value = "";
+      const container = document.getElementById("namesContainer");
+      if (container) container.innerHTML = "";
+      updateUI();
       goToStep("selection");
     }
 
