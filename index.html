@@ -1053,10 +1053,19 @@
       goToStep("payment");
     }
 
+    function escapeHtml(str) {
+      return String(str || "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+    }
+
     function renderSummary() {
       if (!formData) return;
       let namesHtml = formData.names.map((n, i) =>
-        `<div class="name-item"><strong>${i + 1}.</strong> ${n}</div>`
+        `<div class="name-item"><strong>${i + 1}.</strong> ${escapeHtml(n)}</div>`
       ).join("");
 
       let typesText = [];
@@ -1064,7 +1073,7 @@
       if (quantities.matrimonio > 0) typesText.push(`<strong>${quantities.matrimonio}</strong> Matrimonio(s)`);
 
       document.getElementById("summaryContent").innerHTML = `
-        <p class="city">Grupo de ${formData.city}</p>
+        <p class="city">Grupo de ${escapeHtml(formData.city)}</p>
         <p class="entries">${typesText.join(" y ")}</p>
         <div class="summary-names">${namesHtml}</div>
         <p class="total-line">Total: ${formatPrice(getTotalPrice())}</p>

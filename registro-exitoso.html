@@ -208,6 +208,15 @@
     </div>
 
     <script>
+        function escapeHtml(str) {
+            return String(str || "")
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#039;");
+        }
+
         function init() {
             const raw = localStorage.getItem("ticketflow_purchase");
             if (!raw) {
@@ -215,32 +224,40 @@
                 return;
             }
 
-            const p = JSON.parse(raw);
-            const content = document.getElementById("summaryContent");
+            try {
+                const p = JSON.parse(raw);
+                const content = document.getElementById("summaryContent");
 
-            let attendeesHtml = p.names.map((n, i) => 
-                `<div class="attendee-item"><strong>${i+1}.</strong> ${n}</div>`
-            ).join("");
+                const names = Array.isArray(p.names) ? p.names : [];
+                let attendeesHtml = names.map((n, i) => 
+                    `<div class="attendee-item"><strong>${i+1}.</strong> ${escapeHtml(n)}</div>`
+                ).join("");
 
-            let qtyText = [];
-            if (p.quantities && p.quantities.individual > 0) qtyText.push(`${p.quantities.individual} Individual(es)`);
-            if (p.quantities && p.quantities.matrimonio > 0) qtyText.push(`${p.quantities.matrimonio} Matrimonio(s)`);
-            const quantityDisplay = qtyText.length > 0 ? qtyText.join(" + ") : (p.effectiveQty || "1");
+                let qtyText = [];
+                if (p.quantities && p.quantities.individual > 0) qtyText.push(`${p.quantities.individual} Individual(es)`);
+                if (p.quantities && p.quantities.matrimonio > 0) qtyText.push(`${p.quantities.matrimonio} Matrimonio(s)`);
+                const quantityDisplay = qtyText.length > 0 ? escapeHtml(qtyText.join(" + ")) : escapeHtml(p.effectiveQty || "1");
 
-            content.innerHTML = `
-                <div class="summary-row"><span>Entrada:</span> <strong>${p.typeLabel}</strong></div>
-                <div class="summary-row"><span>Cantidad:</span> <strong>${quantityDisplay}</strong></div>
-                <div class="summary-row"><span>Grupo/Iglesia:</span> <strong>${p.city}</strong></div>
-                <div class="summary-divider"></div>
-                <div class="summary-row" style="font-size:18px; color:var(--primary)">
-                    <span>Total Pagado:</span> 
-                    <strong>$${p.totalPrice.toLocaleString("es-AR")}</strong>
-                </div>
-                <div class="attendees-list">
-                    <div class="summary-title" style="font-size:10px; margin-bottom:8px">Asistentes:</div>
-                    ${attendeesHtml}
-                </div>
-            `;
+                const totalFormatted = Number(p.totalPrice || 0).toLocaleString("es-AR");
+
+                content.innerHTML = `
+                    <div class="summary-row"><span>Entrada:</span> <strong>${escapeHtml(p.typeLabel || "General")}</strong></div>
+                    <div class="summary-row"><span>Cantidad:</span> <strong>${quantityDisplay}</strong></div>
+                    <div class="summary-row"><span>Grupo/Iglesia:</span> <strong>${escapeHtml(p.city || "-")}</strong></div>
+                    <div class="summary-divider"></div>
+                    <div class="summary-row" style="font-size:18px; color:var(--primary)">
+                        <span>Total Pagado:</span> 
+                        <strong>$${totalFormatted}</strong>
+                    </div>
+                    <div class="attendees-list">
+                        <div class="summary-title" style="font-size:10px; margin-bottom:8px">Asistentes:</div>
+                        ${attendeesHtml}
+                    </div>
+                `;
+            } catch (err) {
+                console.error("Error al procesar datos de compra:", err);
+                document.getElementById("summaryContent").innerHTML = "<p>Error al leer el resumen.</p>";
+            }
         }
 
         function clearSession() {
