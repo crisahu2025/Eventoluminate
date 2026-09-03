@@ -4,3 +4,5 @@ SCRIPT_LUMINATE_COPIAR.txt
 .env*
 .DS_Store
 Thumbs.db
+
+.vercel
