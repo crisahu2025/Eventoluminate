@@ -1216,16 +1216,9 @@
           }
           if (statusBox) {
             statusBox.style.display = 'block';
-            statusBox.innerHTML = `
-              <div style="background:rgba(255,140,90,0.15); border:1px solid #ff8c5a; border-radius:10px; padding:12px; margin-top:8px; text-align:center;">
-                <p style="margin:0 0 8px 0; color:#f5c842; font-weight:700; font-size:13px;">Si no fuiste redirigido automáticamente en 3 segundos:</p>
-                <a href="${resData.init_point}" target="_top" style="display:inline-block; background:linear-gradient(135deg, #ff8c5a, #b07aff); color:#1a0f1e; font-weight:800; padding:10px 20px; border-radius:8px; text-decoration:none; font-size:14px; box-shadow:0 4px 12px rgba(255,140,90,0.4);">
-                  👉 Abrir Mercado Pago Manualmente
-                </a>
-              </div>
-            `;
+            statusBox.innerHTML = '<span style="color:#f5c842; font-size:14px; font-weight:700;">¡Entradas registradas! Redirigiendo a Mercado Pago... 🚀</span>';
           }
-          // Redirección inmediata a Mercado Pago
+          // Redirección obligatoria y automática inmediata
           window.location.href = resData.init_point;
         } else {
           throw new Error(resData?.error || "No se pudo obtener el link de pago oficial.");
