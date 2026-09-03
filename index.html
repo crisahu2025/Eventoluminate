@@ -1180,15 +1180,11 @@
         statusBox.innerHTML = '<span style="color:var(--primary); font-size:13px; font-weight:600;">✨ Registrando tus entradas y preparando pasarela segura...</span>';
       }
 
-      const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 20000);
-
       try {
         // Disparar ÚNICA llamada atómica 'checkout_atomico'
         const response = await fetch(GOOGLE_SCRIPT_URL, {
           method: "POST",
           headers: { "Content-Type": "text/plain" },
-          signal: controller.signal,
           body: JSON.stringify({
             action: "checkout_atomico",
             token: SECURITY_TOKEN,
@@ -1207,7 +1203,6 @@
           })
         });
 
-        clearTimeout(timeoutId);
         const resData = await response.json();
 
         if (resData && resData.init_point) {
@@ -1225,7 +1220,6 @@
         }
 
       } catch (err) {
-        clearTimeout(timeoutId);
         console.error("Error en llamada de checkout:", err);
 
         if (statusBox) {
