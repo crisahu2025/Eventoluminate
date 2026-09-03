@@ -2,271 +2,769 @@
 <html lang="es" class="dark">
 
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1" />
-    <title>¡Registro Exitoso! - EVENTO LUMINATE</title>
-    <link rel="icon" type="image/png" href="favicon.png" />
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    <style>
-        :root {
-            --bg: #0f172a;
-            --card: rgba(30, 41, 59, 0.65);
-            --primary: #06b6d4;
-            --accent: #a855f7;
-            --text: #f8fafc;
-            --muted: #94a3b8;
-            --border: rgba(255, 255, 255, 0.15);
-            --green: #10b981;
-            --green-bg: rgba(16, 185, 129, 0.1);
-            --radius: 24px;
-            --font-heading: 'Space Grotesk', sans-serif;
-            --font-sans: 'Plus Jakarta Sans', sans-serif;
-        }
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1" />
+  <title>¡Registro Exitoso! - EVENTO LUMINATE</title>
+  <link rel="icon" type="image/png" href="favicon.png" />
+  <meta name="theme-color" content="#ff8c5a" />
 
-        * { box-sizing: border-box; margin: 0; padding: 0; }
+  <!-- Meta tags de seguridad -->
+  <meta http-equiv="X-Content-Type-Options" content="nosniff" />
+  <meta http-equiv="Content-Security-Policy"
+    content="default-src 'self' 'unsafe-inline' 'unsafe-eval' https: data: blob:; font-src 'self' https://fonts.gstatic.com https://cdnjs.cloudflare.com data:; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com; img-src 'self' data: https: blob:; connect-src 'self' https:;" />
 
-        body {
-            font-family: var(--font-sans);
-            background: var(--bg);
-            color: var(--text);
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 20px;
-            -webkit-font-smoothing: antialiased;
-        }
+  <!-- Google Fonts: Rajdhani, Sora y Outfit -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Rajdhani:wght@500;600;700&family=Sora:wght@400;500;600;700&display=swap"
+    rel="stylesheet">
 
-        body, h1, h2, p, span, strong, div {
-            font-family: var(--font-sans);
-        }
-        
-        h1, strong {
-            font-family: var(--font-heading);
-        }
+  <!-- Librerías oficiales para generación de PDF y código QR -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 
-        .card {
-            max-width: 550px;
-            width: 100%;
-            background: var(--card);
-            border: 1px solid var(--border);
-            padding: 48px 32px;
-            border-radius: var(--radius);
-            text-align: center;
-            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3), inset 0 0 0 1px rgba(255, 255, 255, 0.05);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            animation: slideUp 0.6s cubic-bezier(0.16, 1, 0.3, 1);
-        }
+  <style>
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
 
-        @keyframes slideUp {
-            from { opacity: 0; transform: translateY(30px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
+    :root {
+      --bg: #1a0f1e;                         /* Fondo violeta oscuro profundo */
+      --card: rgba(30, 15, 40, 0.88);
+      --primary: #ff8c5a;                    /* Naranja melocotón */
+      --primary-glow: rgba(255, 140, 90, 0.45);
+      --accent: #b07aff;                     /* Lavanda / violeta vivo */
+      --accent-glow: rgba(176, 122, 255, 0.45);
+      --gold: #f5c842;                       /* Dorado oficial */
+      --gold-glow: rgba(245, 200, 66, 0.35);
+      --green: #10b981;
+      --green-glow: rgba(16, 185, 129, 0.35);
+      --text: #fff5ee;
+      --muted: #c4a88a;
+      --border: rgba(255, 140, 90, 0.22);
+      --border-hover: #ff8c5a;
+      --radius: 24px;
+      --radius-sm: 14px;
+      --font-sans: 'Sora', sans-serif;
+      --font-heading: 'Rajdhani', sans-serif;
+      --font-num: 'Outfit', sans-serif;
+    }
 
-        .success-icon {
-            width: 90px;
-            height: 90px;
-            background: var(--green-bg);
-            color: var(--green);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin: 0 auto 24px;
-            font-size: 44px;
-            border: 2px solid var(--green);
-            box-shadow: 0 0 20px rgba(5, 150, 105, 0.2);
-        }
+    body {
+      font-family: var(--font-sans);
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 30px 16px;
+      -webkit-font-smoothing: antialiased;
+      overflow-x: hidden;
+      position: relative;
+    }
 
-        h1 {
-            font-size: 24px;
-            font-weight: 900;
-            color: var(--primary);
-            margin-bottom: 12px;
-            letter-spacing: 1px;
-        }
+    /* Background decoration */
+    .bg-decoration {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      pointer-events: none;
+      background: url('Luminate Nuevo.jpeg') center/cover no-repeat;
+      filter: blur(5px) saturate(1.2);
+      transform: scale(1.08);
+      opacity: 0.45;
+    }
+    
+    .bg-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      pointer-events: none;
+      background: linear-gradient(
+        160deg,
+        rgba(26, 15, 30, 0.94) 0%,
+        rgba(35, 15, 25, 0.90) 40%,
+        rgba(20, 10, 35, 0.95) 100%
+      );
+    }
 
-        .highlight-text {
-            color: var(--accent);
-            font-weight: 800;
-        }
+    .card {
+      position: relative;
+      z-index: 1;
+      max-width: 620px;
+      width: 100%;
+      background: var(--card);
+      border: 1px solid var(--border);
+      padding: 44px 28px;
+      border-radius: var(--radius);
+      text-align: center;
+      box-shadow: 0 24px 60px rgba(0, 0, 0, 0.5), inset 0 0 0 1px rgba(255, 255, 255, 0.06);
+      backdrop-filter: blur(24px);
+      -webkit-backdrop-filter: blur(24px);
+      animation: slideUp 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+    }
 
-        .subtitle {
-            color: var(--muted);
-            font-size: 15px;
-            margin-bottom: 32px;
-            line-height: 1.6;
-        }
+    @keyframes slideUp {
+      from { opacity: 0; transform: translateY(28px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
 
-        .summary-box {
-            background: rgba(255, 255, 255, 0.03);
-            border: 1px solid var(--border);
-            border-radius: 20px;
-            padding: 24px;
-            text-align: left;
-            margin-bottom: 32px;
-        }
+    .success-icon {
+      width: 88px;
+      height: 88px;
+      background: rgba(245, 200, 66, 0.12);
+      color: var(--gold);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 20px;
+      font-size: 42px;
+      border: 2px solid var(--gold);
+      box-shadow: 0 0 25px var(--gold-glow);
+    }
 
-        .summary-title {
-            font-size: 12px;
-            font-weight: 800;
-            color: var(--muted);
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            margin-bottom: 16px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
+    .badge-status {
+      display: inline-block;
+      padding: 5px 16px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 700;
+      background: rgba(16, 185, 129, 0.15);
+      color: #34d399;
+      border: 1px solid rgba(16, 185, 129, 0.4);
+      margin-bottom: 12px;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+    }
 
-        .summary-row {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 8px;
-            font-size: 14px;
-        }
+    h1 {
+      font-family: var(--font-heading);
+      font-size: clamp(28px, 5vw, 42px);
+      font-weight: 700;
+      color: #ffffff;
+      margin-bottom: 8px;
+      letter-spacing: 2px;
+      text-shadow: 0 0 20px var(--primary-glow);
+    }
 
-        .summary-divider {
-            height: 1px;
-            background: var(--border);
-            margin: 16px 0;
-            border: none;
-        }
+    .subtitle {
+      color: var(--muted);
+      font-size: 15px;
+      margin-bottom: 28px;
+      line-height: 1.5;
+    }
 
-        .attendees-list {
-            margin-top: 16px;
-        }
+    .subtitle strong {
+      color: var(--primary);
+    }
 
-        .attendee-item {
-            font-size: 13px;
-            padding: 4px 0;
-            display: flex;
-            gap: 8px;
-            color: var(--text);
-        }
+    .summary-box {
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 22px;
+      text-align: left;
+      margin-bottom: 28px;
+    }
 
-        .btn {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            width: 100%;
-            padding: 18px;
-            background: linear-gradient(135deg, var(--primary), var(--accent));
-            color: white;
-            border-radius: 14px;
-            text-decoration: none;
-            font-weight: 700;
-            font-size: 16px;
-            transition: all 0.2s;
-            border: none;
-            cursor: pointer;
-            box-shadow: 0 4px 15px rgba(6, 182, 212, 0.4);
-        }
+    .summary-title {
+      font-size: 12px;
+      font-weight: 800;
+      color: var(--gold);
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      margin-bottom: 14px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 8px;
+    }
 
-        .btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 25px rgba(6, 182, 212, 0.4), 0 8px 25px rgba(168, 85, 247, 0.4);
-        }
+    .summary-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+      font-size: 14px;
+    }
 
-        .whatsapp-link {
-            display: block;
-            margin-top: 24px;
-            color: var(--muted);
-            font-size: 13px;
-            text-decoration: underline;
-        }
-    </style>
+    .summary-row span:first-child {
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .summary-row strong {
+      color: var(--text);
+      font-weight: 600;
+      text-align: right;
+    }
+
+    .summary-divider {
+      height: 1px;
+      background: var(--border);
+      margin: 14px 0;
+      border: none;
+    }
+
+    .total-row {
+      font-size: 18px;
+      color: var(--gold);
+      font-family: var(--font-num);
+      font-weight: 800;
+    }
+
+    .attendees-list {
+      margin-top: 14px;
+      padding-top: 12px;
+      border-top: 1px solid var(--border);
+    }
+
+    .attendee-item {
+      font-size: 13px;
+      padding: 4px 0;
+      display: flex;
+      gap: 8px;
+      color: var(--text);
+    }
+
+    .attendee-item strong {
+      color: var(--primary);
+      min-width: 20px;
+    }
+
+    /* Actions */
+    .actions-container {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      width: 100%;
+      padding: 16px 24px;
+      border-radius: var(--radius-sm);
+      text-decoration: none;
+      font-weight: 700;
+      font-size: 16px;
+      transition: all 0.25s ease;
+      border: none;
+      cursor: pointer;
+      font-family: var(--font-sans);
+    }
+
+    .btn:active {
+      transform: scale(0.98);
+    }
+
+    .btn-download {
+      background: linear-gradient(135deg, var(--primary), var(--gold), var(--accent));
+      color: #ffffff;
+      box-shadow: 0 6px 20px var(--primary-glow);
+      font-size: 17px;
+    }
+
+    .btn-download:hover {
+      box-shadow: 0 10px 30px var(--primary-glow), 0 10px 25px var(--gold-glow);
+      transform: translateY(-2px);
+    }
+
+    .btn-whatsapp {
+      background: #25d366;
+      color: #0b2e13;
+      font-weight: 800;
+      box-shadow: 0 4px 15px rgba(37, 211, 102, 0.35);
+    }
+
+    .btn-whatsapp:hover {
+      background: #22bf5b;
+      box-shadow: 0 8px 25px rgba(37, 211, 102, 0.5);
+      transform: translateY(-2px);
+    }
+
+    .btn-home {
+      background: rgba(255, 255, 255, 0.06);
+      color: var(--muted);
+      border: 1px solid var(--border);
+    }
+
+    .btn-home:hover {
+      background: rgba(255, 255, 255, 0.12);
+      color: #ffffff;
+      border-color: var(--primary);
+    }
+
+    .footer-support {
+      margin-top: 24px;
+      font-size: 13px;
+      color: var(--muted);
+    }
+
+    .footer-support a {
+      color: var(--gold);
+      text-decoration: underline;
+    }
+
+    /* Off-screen QR container for jsPDF rendering */
+    #qrContainer {
+      position: absolute;
+      left: -9999px;
+      top: -9999px;
+      width: 256px;
+      height: 256px;
+      background: #ffffff;
+    }
+  </style>
 </head>
 
 <body>
-    <div class="card">
-        <div class="success-icon">✓</div>
-        <h1>¡REGISTRO EXITOSO!</h1>
-        <p class="subtitle">
-            Tu pago se <span class="highlight-text">acreditó correctamente</span> y ya estás anotado para 
-            <strong>EVENTO LUMINATE</strong>.
-        </p>
+  <div class="bg-decoration"></div>
+  <div class="bg-overlay"></div>
 
-        <div class="summary-box" id="summary">
-            <div class="summary-title"><span>📋</span> Resumen de Inscripción</div>
-            <div id="summaryContent">
-                <!-- Se llena con JS -->
-                <p style="font-size:12px; color:var(--muted)">Cargando detalles...</p>
-            </div>
-        </div>
+  <!-- Contenedor oculto para renderizar QR -->
+  <div id="qrContainer"></div>
 
-        <a href="index.html" class="btn" onclick="clearSession()">
-            Volver al Inicio 🏠
-        </a>
+  <div class="card">
+    <div class="badge-status">✓ PAGO CONFIRMADO</div>
+    <div class="success-icon">✨</div>
+    <h1>¡REGISTRO EXITOSO!</h1>
+    <p class="subtitle">
+      Tu pago se acreditó correctamente y ya estás anotado para el <strong>EVENTO LUMINATE</strong>.
+    </p>
 
-        <a href="https://wa.me/5493364333287" target="_blank" class="whatsapp-link">
-            ¿Tenés alguna duda? Hablanos por WhatsApp
-        </a>
+    <div class="summary-box" id="summary">
+      <div class="summary-title">📋 Resumen Oficial de Compra</div>
+      <div id="summaryContent">
+        <p style="font-size:13px; color:var(--muted)">Cargando detalles de tu comprobante...</p>
+      </div>
     </div>
 
-    <script>
-        function escapeHtml(str) {
-            return String(str || "")
-                .replace(/&/g, "&amp;")
-                .replace(/</g, "&lt;")
-                .replace(/>/g, "&gt;")
-                .replace(/"/g, "&quot;")
-                .replace(/'/g, "&#039;");
+    <div class="actions-container">
+      <!-- Botón destacado de descarga PDF -->
+      <button class="btn btn-download" id="btnDownload" onclick="generarPDFComprobante()">
+        📥 Descargar Comprobante Oficial (PDF)
+      </button>
+
+      <!-- Botón para compartir por WhatsApp -->
+      <a href="#" class="btn btn-whatsapp" id="btnWhatsApp" target="_blank" rel="noopener">
+        💬 Compartir por WhatsApp
+      </a>
+
+      <!-- Volver al Inicio -->
+      <a href="index.html" class="btn btn-home">
+        🏠 Volver al Inicio
+      </a>
+    </div>
+
+    <div class="footer-support">
+      ¿Tenés alguna consulta sobre el evento o tu acreditación? <br>
+      <a href="https://wa.me/5493364333287" target="_blank">Contactanos por WhatsApp Oficial (+54 9 336 4333287)</a>
+    </div>
+  </div>
+
+  <script>
+    // ===== SANITIZACIÓN =====
+    function escapeHtml(str) {
+      return String(str || "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+    }
+
+    let purchaseData = null;
+
+    // ===== CARGA DE DATOS DESDE STORAGE =====
+    function getPurchaseData() {
+      // Intentar primero desde sessionStorage, luego localStorage
+      const raw = sessionStorage.getItem("ticketflow_purchase") || localStorage.getItem("ticketflow_purchase");
+      if (!raw) return null;
+      try {
+        return JSON.parse(raw);
+      } catch (e) {
+        console.error("Error al parsear datos:", e);
+        return null;
+      }
+    }
+
+    // ===== INICIALIZACIÓN DE PÁGINA =====
+    function init() {
+      // Si hay parámetros en la URL (Mercado Pago redirect)
+      const urlParams = new URLSearchParams(window.location.search);
+      const urlRef = urlParams.get("external_reference");
+
+      purchaseData = getPurchaseData();
+
+      if (!purchaseData) {
+        document.getElementById("summaryContent").innerHTML = `
+          <p style="color:var(--muted); font-size:13px;">
+            No se encontraron datos locales recientes. Si tu pago fue exitoso mediante Mercado Pago,
+            tu comprobante fue enviado a tu correo electrónico.
+          </p>
+        `;
+        document.getElementById("btnDownload").style.display = "none";
+        document.getElementById("btnWhatsApp").style.display = "none";
+        return;
+      }
+
+      if (urlRef && !purchaseData.external_reference) {
+        purchaseData.external_reference = urlRef;
+      }
+
+      const ref = purchaseData.external_reference || ("LUM-" + Date.now());
+      const names = Array.isArray(purchaseData.names) ? purchaseData.names : [];
+      const totalFormatted = Number(purchaseData.totalPrice || 0).toLocaleString("es-AR");
+
+      const qty = (purchaseData.quantities && purchaseData.quantities.individual)
+        ? purchaseData.quantities.individual
+        : (purchaseData.quantity || (names.length > 0 ? names.length : 1));
+      const ticketsLabel = `${qty} Entrada(s) Individual / General`;
+
+      // Renderizar Resumen en UI
+      let attendeesHtml = names.map((n, i) =>
+        `<div class="attendee-item"><strong>${i + 1}.</strong> <span>${escapeHtml(n)}</span></div>`
+      ).join("");
+
+      document.getElementById("summaryContent").innerHTML = `
+        <div class="summary-row"><span>N° Comprobante:</span> <strong>${escapeHtml(ref)}</strong></div>
+        <div class="summary-row"><span>Comprador:</span> <strong>${escapeHtml(purchaseData.buyerEmail || "-")}</strong></div>
+        <div class="summary-row"><span>WhatsApp:</span> <strong>${escapeHtml(purchaseData.buyerPhone || "-")}</strong></div>
+        <div class="summary-row"><span>Iglesia / Pastor:</span> <strong>${escapeHtml(purchaseData.city || "-")} (${escapeHtml(purchaseData.pastor || "-")})</strong></div>
+        <div class="summary-row"><span>Entradas:</span> <strong>${escapeHtml(ticketsLabel)}</strong></div>
+        <div class="summary-divider"></div>
+        <div class="summary-row total-row">
+          <span style="color:var(--gold)">Total Abonado:</span>
+          <strong>$${totalFormatted}</strong>
+        </div>
+        <div class="attendees-list">
+          <div style="font-size:11px; font-weight:700; color:var(--primary); margin-bottom:8px; text-transform:uppercase;">Asistentes Registrados:</div>
+          ${attendeesHtml}
+        </div>
+      `;
+
+      // Configurar enlace de WhatsApp
+      const waText = encodeURIComponent(
+        `✨ *COMPROBANTE OFICIAL - EVENTO LUMINATE*\n\n` +
+        `¡Hola! Confirmo mi acreditación para EVENTO LUMINATE:\n\n` +
+        `📄 *Comprobante N°:* ${ref}\n` +
+        `📧 *Comprador:* ${purchaseData.buyerEmail || "-"}\n` +
+        `⛪ *Iglesia:* ${purchaseData.city || "-"}\n` +
+        `🎟️ *Entradas:* ${ticketsLabel}\n` +
+        `👥 *Asistentes:* ${names.join(", ")}\n` +
+        `💰 *Total Abonado:* $${totalFormatted}\n\n` +
+        `¡Nos vemos en Luminate 2026!`
+      );
+      document.getElementById("btnWhatsApp").href = `https://wa.me/?text=${waText}`;
+    }
+
+    // ===== GENERACIÓN DE COMPROBANTE OFICIAL EN PDF (VECTORES DIRECTOS) =====
+    async function generarPDFComprobante() {
+      if (!purchaseData) return;
+
+      const btn = document.getElementById("btnDownload");
+      const originalText = btn.innerHTML;
+      btn.innerHTML = 'Generando Comprobante Oficial... ⏳';
+      btn.style.pointerEvents = 'none';
+
+      try {
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF({ unit: 'mm', format: 'a4', orientation: 'portrait' });
+
+        const W = 210, H = 297;
+        const mL = 16, mR = 16;
+        const cW = W - mL - mR;
+        const ref = purchaseData.external_reference || ("LUM-" + Date.now());
+        const totalFormatted = Number(purchaseData.totalPrice || 0).toLocaleString("es-AR");
+        const names = Array.isArray(purchaseData.names) ? purchaseData.names : [];
+
+        const fechaObj = new Date(purchaseData.timestamp || Date.now());
+        const fechaStr = fechaObj.toLocaleDateString("es-AR", { day: '2-digit', month: '2-digit', year: 'numeric' });
+        const horaStr = fechaObj.toLocaleTimeString("es-AR", { hour: '2-digit', minute: '2-digit' });
+
+        // 1. Generar Código QR Oficial
+        const qrContainer = document.getElementById("qrContainer");
+        qrContainer.innerHTML = "";
+        const qrContent = `EVENTO LUMINATE 2026 | REF: ${ref} | COMPRADOR: ${purchaseData.buyerEmail || ""} | TOTAL: $${totalFormatted} | ASISTENTES: ${names.join("; ")}`;
+        
+        new QRCode(qrContainer, {
+          text: qrContent,
+          width: 140,
+          height: 140,
+          colorDark: "#1a0f1e",
+          colorLight: "#ffffff",
+          correctLevel: QRCode.CorrectLevel.M
+        });
+
+        // Breve espera para asegurar que el canvas del QR esté disponible en el DOM
+        await new Promise(r => setTimeout(r, 120));
+
+        let qrDataUrl = null;
+        const qrCanvas = qrContainer.querySelector("canvas");
+        if (qrCanvas) {
+          qrDataUrl = qrCanvas.toDataURL("image/png");
+        } else {
+          const qrImg = qrContainer.querySelector("img");
+          if (qrImg) qrDataUrl = qrImg.src;
         }
 
-        function init() {
-            const raw = localStorage.getItem("ticketflow_purchase");
-            if (!raw) {
-                document.getElementById("summaryContent").innerHTML = "<p>No se encontraron datos recientes.</p>";
-                return;
-            }
+        // ====== CABECERA BRANDING LUMINATE ======
+        // Barra superior violeta profundo
+        doc.setFillColor(26, 15, 30);
+        doc.rect(mL, 14, cW, 28, 'F');
 
-            try {
-                const p = JSON.parse(raw);
-                const content = document.getElementById("summaryContent");
+        // Título principal Luminate
+        doc.setFont('helvetica', 'bold');
+        doc.setFontSize(20);
+        doc.setTextColor(255, 255, 255);
+        doc.text('EVENTO LUMINATE', mL + 8, 25);
 
-                const names = Array.isArray(p.names) ? p.names : [];
-                let attendeesHtml = names.map((n, i) => 
-                    `<div class="attendee-item"><strong>${i+1}.</strong> ${escapeHtml(n)}</div>`
-                ).join("");
+        doc.setFontSize(9);
+        doc.setFont('helvetica', 'bold');
+        doc.setTextColor(255, 140, 90); // Melocotón
+        doc.text('COMPROBANTE OFICIAL DE ENTRADA', mL + 8, 33);
 
-                let qtyText = [];
-                if (p.quantities && p.quantities.individual > 0) qtyText.push(`${p.quantities.individual} Individual(es)`);
-                if (p.quantities && p.quantities.matrimonio > 0) qtyText.push(`${p.quantities.matrimonio} Matrimonio(s)`);
-                const quantityDisplay = qtyText.length > 0 ? escapeHtml(qtyText.join(" + ")) : escapeHtml(p.effectiveQty || "1");
+        // Subtítulo derecho
+        doc.setFontSize(8);
+        doc.setFont('helvetica', 'bold');
+        doc.setTextColor(245, 200, 66); // Dorado
+        doc.text('ACREDITACIÓN DIGITAL VÁLIDA', W - mR - 8, 24, { align: 'right' });
+        doc.setFont('helvetica', 'normal');
+        doc.setTextColor(200, 190, 215);
+        doc.text('Iglesia Gran Rey • Venta Oficial', W - mR - 8, 32, { align: 'right' });
 
-                const totalFormatted = Number(p.totalPrice || 0).toLocaleString("es-AR");
+        // Rayas de acento de paleta (Melocotón, Dorado, Lavanda)
+        doc.setFillColor(255, 140, 90);
+        doc.rect(mL, 42, cW * 0.5, 2, 'F');
+        doc.setFillColor(245, 200, 66);
+        doc.rect(mL + (cW * 0.5), 42, cW * 0.25, 2, 'F');
+        doc.setFillColor(176, 122, 255);
+        doc.rect(mL + (cW * 0.75), 42, cW * 0.25, 2, 'F');
 
-                content.innerHTML = `
-                    <div class="summary-row"><span>Entrada:</span> <strong>${escapeHtml(p.typeLabel || "General")}</strong></div>
-                    <div class="summary-row"><span>Cantidad:</span> <strong>${quantityDisplay}</strong></div>
-                    <div class="summary-row"><span>Grupo/Iglesia:</span> <strong>${escapeHtml(p.city || "-")}</strong></div>
-                    <div class="summary-divider"></div>
-                    <div class="summary-row" style="font-size:18px; color:var(--primary)">
-                        <span>Total Pagado:</span> 
-                        <strong>$${totalFormatted}</strong>
-                    </div>
-                    <div class="attendees-list">
-                        <div class="summary-title" style="font-size:10px; margin-bottom:8px">Asistentes:</div>
-                        ${attendeesHtml}
-                    </div>
-                `;
-            } catch (err) {
-                console.error("Error al procesar datos de compra:", err);
-                document.getElementById("summaryContent").innerHTML = "<p>Error al leer el resumen.</p>";
-            }
+        let y = 52;
+
+        // ====== BLOQUES DE INFORMACIÓN (COMPRADOR & COMPROBANTE) ======
+        const colW = (cW - 6) / 2;
+
+        // Tarjeta Izquierda: Datos del Comprador
+        doc.setFillColor(250, 246, 252);
+        doc.roundedRect(mL, y, colW, 40, 3, 3, 'F');
+        doc.setDrawColor(230, 215, 240);
+        doc.roundedRect(mL, y, colW, 40, 3, 3, 'S');
+
+        doc.setFont('helvetica', 'bold');
+        doc.setFontSize(8.5);
+        doc.setTextColor(255, 140, 90);
+        doc.text('DATOS DEL COMPRADOR (TITULAR)', mL + 6, y + 7);
+
+        doc.setFontSize(8);
+        doc.setFont('helvetica', 'normal');
+        doc.setTextColor(50, 40, 60);
+        doc.text('Email: ' + (purchaseData.buyerEmail || 'No especificado'), mL + 6, y + 14);
+        doc.text('WhatsApp: ' + (purchaseData.buyerPhone || 'No especificado'), mL + 6, y + 21);
+        doc.text('Iglesia / Ciudad: ' + (purchaseData.city || '-'), mL + 6, y + 28);
+        doc.text('Pastor: ' + (purchaseData.pastor || '-'), mL + 6, y + 35);
+
+        // Tarjeta Derecha: Detalles del Comprobante
+        const rX = mL + colW + 6;
+        doc.setFillColor(250, 246, 252);
+        doc.roundedRect(rX, y, colW, 40, 3, 3, 'F');
+        doc.setDrawColor(230, 215, 240);
+        doc.roundedRect(rX, y, colW, 40, 3, 3, 'S');
+
+        doc.setFont('helvetica', 'bold');
+        doc.setFontSize(8.5);
+        doc.setTextColor(255, 140, 90);
+        doc.text('DETALLES DE LA TRANSACCIÓN', rX + 6, y + 7);
+
+        doc.setFontSize(8);
+        doc.setFont('helvetica', 'normal');
+        doc.setTextColor(50, 40, 60);
+        doc.text('N° de Comprobante: ' + ref, rX + 6, y + 14);
+        doc.text('Fecha de emisión: ' + fechaStr, rX + 6, y + 21);
+        doc.text('Hora de emisión: ' + horaStr + ' hs', rX + 6, y + 28);
+
+        doc.setFont('helvetica', 'bold');
+        doc.setTextColor(16, 185, 129); // Verde de aprobado
+        doc.text('Estado: PAGO ACREDITADO ✓', rX + 6, y + 35);
+
+        y += 48;
+
+        // ====== TABLA DE ENTRADAS ======
+        doc.setFont('helvetica', 'bold');
+        doc.setFontSize(9.5);
+        doc.setTextColor(26, 15, 30);
+        doc.text('DETALLE DE ENTRADAS ADQUIRIDAS', mL, y);
+        y += 4;
+
+        // Cabecera de la tabla
+        doc.setFillColor(26, 15, 30);
+        doc.rect(mL, y, cW, 8, 'F');
+
+        doc.setFontSize(8);
+        doc.setFont('helvetica', 'bold');
+        doc.setTextColor(255, 255, 255);
+        doc.text('Descripción de Entrada', mL + 6, y + 5.5);
+        doc.text('Cant.', mL + 90, y + 5.5, { align: 'center' });
+        doc.text('Precio Unitario', W - mR - 36, y + 5.5, { align: 'right' });
+        doc.text('Subtotal', W - mR - 6, y + 5.5, { align: 'right' });
+
+        y += 8;
+
+        const qty = (purchaseData.quantities && purchaseData.quantities.individual)
+          ? purchaseData.quantities.individual
+          : (purchaseData.quantity || (names.length > 0 ? names.length : 1));
+        const unitPrice = 29990;
+        const subtotal = qty * unitPrice;
+
+        const items = [
+          {
+            desc: "Entrada Individual / General (Acceso Oficial)",
+            cant: qty,
+            unit: unitPrice,
+            subtotal: subtotal
+          }
+        ];
+
+        doc.setFont('helvetica', 'normal');
+        doc.setFontSize(8);
+
+        items.forEach((item, idx) => {
+          if (idx % 2 === 0) {
+            doc.setFillColor(252, 250, 254);
+            doc.rect(mL, y, cW, 8, 'F');
+          }
+          doc.setTextColor(50, 40, 60);
+          doc.text(item.desc, mL + 6, y + 5.5);
+          doc.text(String(item.cant), mL + 90, y + 5.5, { align: 'center' });
+          doc.text("$" + item.unit.toLocaleString("es-AR"), W - mR - 36, y + 5.5, { align: 'right' });
+          doc.text("$" + item.subtotal.toLocaleString("es-AR"), W - mR - 6, y + 5.5, { align: 'right' });
+
+          doc.setDrawColor(235, 225, 240);
+          doc.line(mL, y + 8, W - mR, y + 8);
+          y += 8;
+        });
+
+        // Fila de Total
+        doc.setFillColor(255, 248, 240);
+        doc.rect(mL, y, cW, 9, 'F');
+        doc.setDrawColor(255, 140, 90);
+        doc.rect(mL, y, cW, 9, 'S');
+
+        doc.setFont('helvetica', 'bold');
+        doc.setFontSize(9);
+        doc.setTextColor(255, 140, 90);
+        doc.text('TOTAL OFICIAL PAGADO:', W - mR - 45, y + 6, { align: 'right' });
+
+        doc.setFontSize(11);
+        doc.setTextColor(26, 15, 30);
+        doc.text('$' + totalFormatted, W - mR - 6, y + 6.2, { align: 'right' });
+
+        y += 16;
+
+        // ====== LISTA OFICIAL DE ASISTENTES ======
+        doc.setFont('helvetica', 'bold');
+        doc.setFontSize(9.5);
+        doc.setTextColor(26, 15, 30);
+        doc.text('LISTA OFICIAL DE ASISTENTES REGISTRADOS (' + names.length + ' Personas)', mL, y);
+        y += 4;
+
+        const attendeesBoxH = Math.max(26, (names.length * 6) + 8);
+        doc.setFillColor(250, 248, 252);
+        doc.roundedRect(mL, y, cW, attendeesBoxH, 3, 3, 'F');
+        doc.setDrawColor(230, 215, 240);
+        doc.roundedRect(mL, y, cW, attendeesBoxH, 3, 3, 'S');
+
+        let attY = y + 6;
+        doc.setFont('helvetica', 'normal');
+        doc.setFontSize(8);
+        doc.setTextColor(50, 40, 60);
+
+        names.forEach((name, i) => {
+          doc.setFont('helvetica', 'bold');
+          doc.setTextColor(255, 140, 90);
+          doc.text(`${i + 1}.`, mL + 6, attY);
+
+          doc.setFont('helvetica', 'normal');
+          doc.setTextColor(40, 30, 50);
+          doc.text(String(name), mL + 12, attY);
+          attY += 6;
+        });
+
+        // ====== PIE DE PÁGINA CON QR Y REGLAS DE ACREDITACIÓN ======
+        const fY = H - 46;
+
+        // Separador decorativo
+        doc.setDrawColor(220, 210, 230);
+        doc.line(mL, fY, W - mR, fY);
+
+        // QR Code Oficial a la derecha
+        if (qrDataUrl) {
+          try {
+            doc.addImage(qrDataUrl, 'PNG', W - mR - 34, fY + 4, 34, 34);
+          } catch (qrErr) {
+            console.warn("No se pudo dibujar imagen QR:", qrErr);
+          }
         }
 
-        function clearSession() {
-            localStorage.removeItem("ticketflow_purchase");
-        }
+        // Texto legal y de soporte
+        doc.setFontSize(8.5);
+        doc.setFont('helvetica', 'bold');
+        doc.setTextColor(26, 15, 30);
+        doc.text('INFORMACIÓN IMPORTANTE PARA LA ACREDITACIÓN:', mL, fY + 7);
 
-        // Ejecutar al cargar
-        init();
-    </script>
+        doc.setFontSize(7.5);
+        doc.setFont('helvetica', 'normal');
+        doc.setTextColor(90, 80, 100);
+        doc.text('• Presentar este comprobante oficial en formato digital (celular) o impreso.', mL, fY + 13);
+        doc.text('• Cada asistente debe concurrir con su DNI para la entrega de la pulsera oficial.', mL, fY + 18);
+        doc.text('• Entrada intransferible sin previa autorización de los organizadores.', mL, fY + 23);
+
+        doc.setFont('helvetica', 'bold');
+        doc.setTextColor(255, 140, 90);
+        doc.text('Soporte oficial WhatsApp: +54 9 336 4333287 • Iglesia Gran Rey', mL, fY + 30);
+
+        doc.setFontSize(7);
+        doc.setFont('helvetica', 'italic');
+        doc.setTextColor(140, 130, 150);
+        doc.text('Documento digital generado automáticamente y verificado por el sistema de Luminate.', mL, fY + 35);
+
+        // Guardar y descargar PDF
+        const filename = `Comprobante_Luminate_${ref}.pdf`;
+        doc.save(filename);
+
+      } catch (err) {
+        console.error("Error al generar PDF:", err);
+        alert("Hubo un problema al generar el PDF. Por favor intentá nuevamente.");
+      } finally {
+        btn.innerHTML = originalText;
+        btn.style.pointerEvents = 'all';
+      }
+    }
+
+    // ===== EJECUCIÓN INICIAL =====
+    init();
+
+    // ===== DESREGISTRO DE SERVICE WORKER RESIDUAL =====
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.getRegistrations().then(registrations => {
+        for (let registration of registrations) {
+          registration.unregister();
+        }
+      });
+    }
+  </script>
 </body>
 
 </html>

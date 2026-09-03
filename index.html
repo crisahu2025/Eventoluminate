@@ -4,18 +4,27 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1" />
-  <title>EVENTO LUMINATE</title>
+  <title>EVENTO LUMINATE - Entradas Oficiales</title>
   <link rel="icon" type="image/png" href="favicon.png" />
+  <meta name="theme-color" content="#ff8c5a" />
   <meta name="description"
     content="Adquiere tus entradas para EVENTO LUMINATE. Venta oficial de entradas online." />
   <meta property="og:title" content="EVENTO LUMINATE - Entradas" />
   <meta property="og:description" content="Adquiere tus entradas para EVENTO LUMINATE." />
   <meta property="og:type" content="website" />
+
+  <!-- Meta tags de seguridad -->
+  <meta http-equiv="X-Content-Type-Options" content="nosniff" />
+  <meta http-equiv="Content-Security-Policy"
+    content="default-src 'self' 'unsafe-inline' 'unsafe-eval' https: data: blob:; font-src 'self' https://fonts.gstatic.com https://cdnjs.cloudflare.com data:; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com; img-src 'self' data: https: blob:; connect-src 'self' https:;" />
+
+  <!-- Google Fonts: Rajdhani, Sora y Outfit -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link
-    href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700;800&family=Rajdhani:wght@400;500;600;700&display=swap"
+    href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Rajdhani:wght@500;600;700&family=Sora:wght@400;500;600;700&display=swap"
     rel="stylesheet">
+
   <style>
     *,
     *::before,
@@ -27,16 +36,16 @@
 
     :root {
       --bg: #1a0f1e;                         /* Fondo oscuro violeta profundo */
-      --card: rgba(30, 15, 40, 0.82);
+      --card: rgba(30, 15, 40, 0.85);
       --primary: #ff8c5a;                    /* Naranja melocotón vibrante */
       --primary-glow: rgba(255, 140, 90, 0.45);
-      --accent: #b07aff;                     /* Violeta/lavanda vivo */
+      --accent: #b07aff;                     /* Violeta / lavanda vivo */
       --accent-glow: rgba(176, 122, 255, 0.45);
-      --gold: #f5c842;                       /* Dorado de la imagen */
+      --gold: #f5c842;                       /* Dorado oficial */
       --gold-glow: rgba(245, 200, 66, 0.35);
       --text: #fff5ee;
       --muted: #c4a88a;
-      --border: rgba(255, 140, 90, 0.20);
+      --border: rgba(255, 140, 90, 0.22);
       --border-hover: #ff8c5a;
       --destructive: #f43f5e;
       --mp-blue: #009EE3;
@@ -45,13 +54,13 @@
       --radius-sm: 12px;
       --font-sans: 'Sora', sans-serif;
       --font-heading: 'Rajdhani', sans-serif;
+      --font-num: 'Outfit', sans-serif;
     }
 
     html {
       scroll-behavior: smooth;
     }
 
-    /* Forzamos la fuente en todos los elementos de texto */
     body,
     h1, h2, h3, h4, h5 {
       font-family: var(--font-heading) !important;
@@ -79,9 +88,9 @@
       z-index: 0;
       pointer-events: none;
       background: url('Luminate Nuevo.jpeg') center/cover no-repeat;
-      filter: blur(3px) saturate(1.2);
-      transform: scale(1.07); /* Evita bordes blancos por el blur */
-      opacity: 0.55;
+      filter: blur(4px) saturate(1.2);
+      transform: scale(1.08);
+      opacity: 0.45;
     }
     
     .bg-overlay {
@@ -91,9 +100,9 @@
       pointer-events: none;
       background: linear-gradient(
         160deg,
-        rgba(26, 15, 30, 0.88) 0%,
-        rgba(40, 15, 20, 0.82) 40%,
-        rgba(20, 10, 35, 0.88) 100%
+        rgba(26, 15, 30, 0.92) 0%,
+        rgba(35, 15, 25, 0.88) 40%,
+        rgba(20, 10, 35, 0.94) 100%
       );
     }
 
@@ -102,46 +111,46 @@
       z-index: 1;
       max-width: 900px;
       margin: 0 auto;
-      padding: 48px 24px 100px;
+      padding: 40px 20px 80px;
     }
 
     /* Header */
     .header {
       text-align: center;
-      margin-bottom: 48px;
+      margin-bottom: 36px;
       animation: fadeInDown 0.6s ease;
     }
 
     .badge {
       display: inline-block;
-      padding: 6px 16px;
+      padding: 6px 18px;
       border-radius: 999px;
       font-size: 13px;
       font-weight: 600;
-      background: rgba(255, 140, 90, 0.12);
+      background: rgba(255, 140, 90, 0.14);
       color: var(--primary);
-      border: 1px solid rgba(255, 140, 90, 0.30);
+      border: 1px solid rgba(255, 140, 90, 0.35);
       backdrop-filter: blur(8px);
-      margin-bottom: 16px;
-      letter-spacing: 1px;
+      margin-bottom: 14px;
+      letter-spacing: 1.5px;
     }
 
     .header h1 {
       font-family: var(--font-heading);
-      font-size: clamp(30px, 6vw, 60px);
+      font-size: clamp(32px, 6vw, 62px);
       font-weight: 700;
       color: #ffffff;
       text-shadow: 0 0 30px var(--primary-glow), 0 0 60px var(--accent-glow), 0 0 80px var(--gold-glow);
       letter-spacing: 8px;
       text-transform: uppercase;
       line-height: 1.1;
-      margin-top: 10px;
+      margin-top: 8px;
     }
 
     .header p {
       color: var(--primary);
-      font-weight: 500;
-      margin-top: 12px;
+      font-weight: 600;
+      margin-top: 10px;
       font-size: 14px;
       letter-spacing: 4px;
       text-transform: uppercase;
@@ -154,7 +163,7 @@
       border: 1px solid var(--border);
       border-radius: var(--radius);
       overflow: hidden;
-      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3), inset 0 0 0 1px rgba(255, 255, 255, 0.05);
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.4), inset 0 0 0 1px rgba(255, 255, 255, 0.05);
       backdrop-filter: blur(20px);
       -webkit-backdrop-filter: blur(20px);
     }
@@ -162,7 +171,7 @@
     /* Progress Bar */
     .progress-track {
       height: 4px;
-      background: rgba(255, 255, 255, 0.05);
+      background: rgba(255, 255, 255, 0.06);
     }
 
     .progress-fill {
@@ -173,12 +182,12 @@
     }
 
     .card-body {
-      padding: 32px;
+      padding: 28px 20px;
     }
 
     @media (min-width: 768px) {
       .card-body {
-        padding: 48px;
+        padding: 44px;
       }
     }
 
@@ -187,7 +196,7 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 24px;
+      margin-bottom: 20px;
     }
 
     .top-bar .back-btn {
@@ -208,10 +217,12 @@
 
     /* Step titles */
     .step-title {
-      font-size: 24px;
+      font-size: 26px;
       font-weight: 700;
-      margin-bottom: 24px;
+      margin-bottom: 20px;
       font-family: var(--font-heading);
+      color: #ffffff;
+      letter-spacing: 1px;
     }
 
     /* Step sections */
@@ -224,18 +235,12 @@
       display: block;
     }
 
-    /* Ticket type cards */
+    /* Ticket card - Tarjeta Única Centrada Responsiva */
     .ticket-grid {
-      display: grid;
-      gap: 16px;
-      grid-template-columns: 1fr;
-    }
-
-    @media (min-width: 768px) {
-      .ticket-grid {
-        grid-template-columns: 280px;
-        justify-content: center;
-      }
+      display: flex;
+      justify-content: center;
+      gap: 20px;
+      width: 100%;
     }
 
     .ticket-card {
@@ -243,14 +248,15 @@
       display: flex;
       flex-direction: column;
       align-items: center;
-      padding: 30px 20px;
+      padding: 36px 28px;
       border-radius: var(--radius);
       border: 2px solid var(--border);
-      background: rgba(255, 255, 255, 0.05);
-      /* Color oscuro translúcido */
+      background: rgba(255, 255, 255, 0.03);
       cursor: pointer;
       transition: all 0.3s ease;
       text-align: center;
+      width: 100%;
+      max-width: 440px;
     }
 
     .ticket-card:hover {
@@ -266,14 +272,14 @@
     }
 
     .ticket-icon {
-      width: 48px;
-      height: 48px;
+      width: 52px;
+      height: 52px;
       border-radius: var(--radius-sm);
       display: flex;
       align-items: center;
       justify-content: center;
       margin-bottom: 16px;
-      font-size: 22px;
+      font-size: 26px;
       background: rgba(255, 255, 255, 0.06);
       color: var(--muted);
       transition: all 0.3s;
@@ -282,38 +288,55 @@
     .ticket-card.selected .ticket-icon {
       background: var(--primary);
       color: white;
+      box-shadow: 0 0 15px var(--primary-glow);
     }
 
     .ticket-card h3 {
-      font-size: 16px;
-      font-weight: 900;
-      margin-bottom: 4px;
+      font-size: 19px;
+      font-weight: 700;
+      margin-bottom: 6px;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      color: #ffffff;
+    }
+
+    .ticket-card .desc {
+      font-size: 12px;
+      color: var(--muted);
+      flex-grow: 1;
+      margin-bottom: 14px;
+      line-height: 1.4;
+    }
+
+    .ticket-card .capacity-tag {
+      font-size: 11px;
+      font-weight: 600;
+      padding: 3px 10px;
+      border-radius: 999px;
+      background: rgba(176, 122, 255, 0.15);
+      color: var(--accent);
+      border: 1px solid rgba(176, 122, 255, 0.3);
+      margin-bottom: 10px;
       text-transform: uppercase;
       letter-spacing: 1px;
     }
 
-    .ticket-card .desc {
-      font-size: 11px;
-      color: var(--muted);
-      flex-grow: 1;
-      margin-bottom: 12px;
-      line-height: 1.2;
-    }
-
     .ticket-card .price {
-      font-family: var(--font-heading);
-      font-size: 28px;
-      font-weight: 700;
+      font-family: var(--font-num);
+      font-size: 30px;
+      font-weight: 800;
       color: #ffffff;
-      margin-top: 10px;
-      text-shadow: 0 0 10px var(--primary-glow);
+      margin-top: 4px;
+      text-shadow: 0 0 12px var(--primary-glow);
     }
 
     .ticket-card .check {
       position: absolute;
       top: 16px;
       right: 16px;
-      color: var(--primary);
+      color: var(--gold);
+      font-size: 18px;
+      font-weight: 800;
       opacity: 0;
       transition: opacity 0.3s;
     }
@@ -347,17 +370,11 @@
       font-weight: 600;
     }
 
-    .quantity-box .sub {
-      font-size: 13px;
-      color: var(--muted);
-    }
-
     .qty-controls {
       display: flex;
       align-items: center;
       gap: 16px;
       background: rgba(255, 255, 255, 0.05);
-      /* Gris muy oscuro */
       padding: 8px;
       border-radius: var(--radius-sm);
       border: 1px solid var(--border);
@@ -367,11 +384,12 @@
       width: 40px;
       height: 40px;
       border-radius: 10px;
-      background: rgba(255, 255, 255, 0.1);
+      background: rgba(255, 255, 255, 0.08);
       border: 1px solid var(--border);
       color: var(--text);
       cursor: pointer;
-      font-size: 18px;
+      font-size: 20px;
+      font-weight: 700;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -379,20 +397,22 @@
     }
 
     .qty-btn:disabled {
-      opacity: 0.3;
+      opacity: 0.25;
       cursor: not-allowed;
     }
 
     .qty-btn:not(:disabled):hover {
-      background: rgba(255, 255, 255, 0.1);
+      background: rgba(255, 140, 90, 0.2);
+      border-color: var(--primary);
     }
 
     .qty-value {
-      font-size: 28px;
-      font-family: 'Outfit', monospace;
+      font-size: 26px;
+      font-family: var(--font-num);
       font-weight: 800;
-      width: 48px;
+      width: 44px;
       text-align: center;
+      color: #ffffff;
     }
 
     /* Total bar */
@@ -401,7 +421,7 @@
       flex-direction: column;
       gap: 16px;
       padding-top: 24px;
-      margin-top: 24px;
+      margin-top: 28px;
       border-top: 1px solid var(--border);
       align-items: center;
     }
@@ -414,14 +434,18 @@
     }
 
     .total-label {
-      font-size: 14px;
+      font-size: 13px;
       color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 1px;
     }
 
     .total-value {
-      font-size: 32px;
+      font-size: 34px;
       font-weight: 800;
-      font-family: 'Outfit', monospace;
+      font-family: var(--font-num);
+      color: #ffffff;
+      text-shadow: 0 0 15px var(--gold-glow);
     }
 
     /* Buttons */
@@ -429,16 +453,17 @@
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      gap: 8px;
-      padding: 16px 32px;
+      gap: 10px;
+      padding: 16px 36px;
       border-radius: var(--radius-sm);
       font-size: 16px;
       font-weight: 700;
       border: none;
       cursor: pointer;
-      transition: all 0.2s;
+      transition: all 0.25s ease;
       font-family: var(--font-sans);
       width: 100%;
+      text-decoration: none;
     }
 
     @media (min-width: 768px) {
@@ -448,41 +473,34 @@
     }
 
     .btn:active {
-      transform: scale(0.97);
+      transform: scale(0.98);
     }
 
     .btn-primary {
       background: linear-gradient(135deg, var(--primary), var(--gold), var(--accent));
-      color: white;
-      box-shadow: 0 4px 15px var(--primary-glow);
+      color: #ffffff;
+      box-shadow: 0 4px 18px var(--primary-glow);
     }
 
     .btn-primary:hover {
-      box-shadow: 0 8px 25px var(--primary-glow), 0 8px 25px var(--accent-glow), 0 4px 20px var(--gold-glow);
+      box-shadow: 0 8px 28px var(--primary-glow), 0 8px 25px var(--accent-glow), 0 4px 20px var(--gold-glow);
       transform: translateY(-2px);
     }
 
     .btn-mp {
       background: var(--mp-blue);
       color: white;
+      font-size: 17px;
+      box-shadow: 0 4px 20px rgba(0, 158, 227, 0.4);
     }
 
     .btn-mp:hover {
       background: var(--mp-blue-hover);
+      box-shadow: 0 8px 30px rgba(0, 158, 227, 0.6);
+      transform: translateY(-2px);
     }
 
-    .btn-outline {
-      background: transparent;
-      color: var(--muted);
-      border: 1px solid var(--border);
-    }
-
-    .btn-outline:hover {
-      color: white;
-      border-color: var(--border-hover);
-    }
-
-    /* Form inputs - new style with accent left border */
+    /* Form inputs */
     .form-group {
       margin-bottom: 20px;
       position: relative;
@@ -490,19 +508,19 @@
 
     .form-label {
       display: block;
-      font-size: 11px;
+      font-size: 12px;
       font-weight: 600;
       color: var(--primary);
       margin-bottom: 8px;
       text-transform: uppercase;
-      letter-spacing: 2px;
+      letter-spacing: 1.5px;
       font-family: var(--font-sans) !important;
     }
 
     .form-input {
       width: 100%;
-      background: rgba(0, 0, 0, 0.3);
-      border: none;
+      background: rgba(0, 0, 0, 0.35);
+      border: 1px solid var(--border);
       border-left: 3px solid var(--primary);
       border-radius: var(--radius-sm);
       padding: 16px 20px;
@@ -514,42 +532,41 @@
     }
 
     .form-input:focus {
-      border-left-color: var(--accent);
-      background: rgba(34, 211, 238, 0.05);
+      border-left-color: var(--gold);
+      background: rgba(255, 140, 90, 0.06);
       box-shadow: 4px 0 20px var(--primary-glow);
     }
 
     .form-input.error {
       border-left-color: var(--destructive);
+      border-color: var(--destructive);
     }
 
     .error-text {
       color: var(--destructive);
-      font-size: 11px;
+      font-size: 12px;
       margin-top: 4px;
     }
 
     .form-section {
-      background: rgba(34, 211, 238, 0.03);
-      padding: 28px;
+      background: rgba(255, 255, 255, 0.03);
+      padding: 26px;
       border-radius: var(--radius);
       border: 1px solid var(--border);
     }
 
     .form-section-title {
-      font-size: 11px;
+      font-size: 13px;
       font-weight: 700;
-      color: var(--primary);
+      color: var(--gold);
       text-transform: uppercase;
-      letter-spacing: 3px;
-      text-align: center;
-      margin-bottom: 4px;
+      letter-spacing: 2px;
+      margin-bottom: 6px;
     }
 
     .form-section-sub {
-      font-size: 12px;
+      font-size: 13px;
       color: var(--muted);
-      text-align: center;
       margin-bottom: 20px;
     }
 
@@ -572,17 +589,18 @@
 
     /* Payment Summary */
     .summary-icon {
-      width: 64px;
-      height: 64px;
+      width: 68px;
+      height: 68px;
       border-radius: 50%;
       display: flex;
       align-items: center;
       justify-content: center;
       margin: 0 auto 16px;
       font-size: 32px;
-      background: rgba(59, 130, 246, 0.15);
-      color: #3b82f6;
-      border: 1px solid rgba(59, 130, 246, 0.3);
+      background: rgba(255, 140, 90, 0.15);
+      color: var(--primary);
+      border: 1px solid rgba(255, 140, 90, 0.35);
+      box-shadow: 0 0 20px var(--primary-glow);
     }
 
     .summary-card {
@@ -591,36 +609,46 @@
       border-radius: var(--radius);
       border: 1px solid var(--border);
       text-align: left;
-      margin-bottom: 16px;
+      margin-bottom: 20px;
+    }
+
+    .summary-card .contact-line {
+      font-size: 13px;
+      color: var(--muted);
+      margin-bottom: 6px;
     }
 
     .summary-card .city {
       font-size: 14px;
-      color: var(--muted);
-      font-style: italic;
+      color: var(--text);
+      font-weight: 600;
     }
 
     .summary-card .entries {
       font-size: 14px;
-      margin-top: 4px;
+      margin-top: 6px;
     }
 
     .summary-card .entries strong {
-      color: white;
+      color: var(--gold);
     }
 
     .summary-card .total-line {
       border-top: 1px solid var(--border);
-      margin-top: 12px;
-      padding-top: 12px;
-      font-size: 18px;
+      margin-top: 16px;
+      padding-top: 14px;
+      font-size: 20px;
       font-weight: 800;
-      font-family: 'Outfit', monospace;
+      font-family: var(--font-num);
+      color: #ffffff;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
     }
 
     .summary-names {
-      margin-top: 12px;
-      padding-top: 12px;
+      margin-top: 14px;
+      padding-top: 14px;
       border-top: 1px solid var(--border);
     }
 
@@ -642,10 +670,11 @@
       font-size: 14px;
       color: var(--muted);
       margin-bottom: 24px;
+      line-height: 1.5;
     }
 
     .btn-container {
-      max-width: 380px;
+      max-width: 400px;
       margin: 0 auto;
       display: flex;
       flex-direction: column;
@@ -653,11 +682,11 @@
     }
 
     .edit-link {
-      display: block;
+      display: inline-block;
       text-align: center;
-      margin-top: 16px;
+      margin-top: 18px;
       color: var(--muted);
-      font-size: 12px;
+      font-size: 13px;
       text-decoration: underline;
       text-underline-offset: 4px;
       cursor: pointer;
@@ -696,23 +725,16 @@
       }
     }
 
-    /* SVG icons inline */
-    .icon {
-      width: 18px;
-      height: 18px;
-      display: inline-block;
-      vertical-align: middle;
-    }
-
-    /* ===== MOBILE ONLY: centrado de tarjetas y controles ===== */
+    /* Mobile adjustments */
     @media (max-width: 767px) {
       .ticket-grid {
-        justify-items: center;
+        justify-content: center;
       }
 
       .ticket-card {
         width: 100%;
-        max-width: 320px;
+        max-width: 360px;
+        padding: 28px 18px;
       }
 
       .quantity-box {
@@ -720,7 +742,7 @@
         text-align: center;
       }
 
-      .quantity-box>div:first-child {
+      .quantity-box > div:first-child {
         width: 100%;
         text-align: center;
       }
@@ -734,7 +756,7 @@
         text-align: center;
       }
 
-      .total-bar>div {
+      .total-bar > div {
         width: 100%;
         text-align: center;
       }
@@ -743,8 +765,6 @@
         width: 100%;
       }
     }
-
-    /* ======================================================= */
   </style>
 </head>
 
@@ -754,6 +774,7 @@
 
   <div class="container">
     <div class="header">
+      <div class="badge">✨ EVENTO OFICIAL 2026</div>
       <h1>EVENTO LUMINATE</h1>
       <p>Un tiempo para brillar</p>
     </div>
@@ -771,103 +792,123 @@
           <div></div>
         </div>
 
-        <!-- STEP 1: Selection -->
+        <!-- PASO 1: Selección de Entradas -->
         <div class="step-section active" id="step-selection">
           <h2 class="step-title">1. Elige tu entrada</h2>
 
-          <div id="selectionSummary" class="quantity-box" style="display:none; background:rgba(6, 95, 70, 0.08); border:2px solid var(--primary); margin-bottom:24px; padding:24px;">
+          <!-- Resumen del carrito activo -->
+          <div id="selectionSummary" class="quantity-box"
+            style="display:none; background:rgba(255, 140, 90, 0.08); border:2px solid var(--primary); margin-bottom:24px; padding:22px;">
             <div style="width:100%">
-              <h4 style="font-size:18px; color:var(--primary); margin-bottom:12px;">🛒 Tu carrito:</h4>
-              <div id="summaryText" style="font-size:16px; font-weight:600; line-height:1.6; color:var(--text);"></div>
+              <h4 style="font-size:17px; color:var(--gold); margin-bottom:10px;">🛒 Tu carrito seleccionado:</h4>
+              <div id="summaryText" style="font-size:15px; font-weight:600; line-height:1.6; color:var(--text);"></div>
             </div>
           </div>
 
+          <!-- Tarjeta de Entrada Única: Entrada Individual / General -->
           <div class="ticket-grid" id="ticketGrid">
+            <!-- Entrada Individual / General -->
             <div class="ticket-card" data-type="individual" onclick="selectType('individual')">
-              <div class="ticket-icon">👤</div>
               <div class="check">✓</div>
-              <h3>Individual</h3>
-              <p class="desc">Acceso personal al evento online.</p>
+              <div class="ticket-icon">🎟️</div>
+              <h3>Entrada Individual / General</h3>
+              <span class="capacity-tag">Acceso Personal • 1 Asistente</span>
+              <p class="desc">Acceso personal completo al evento oficial Luminate 2026.</p>
               <div class="price">$29.990</div>
-              <div class="qty-controls" style="margin-top:16px;" onclick="event.stopPropagation()">
-                <button class="qty-btn" onclick="changeQty('individual', -1)">−</button>
+              <div class="qty-controls" style="margin-top:18px;" onclick="event.stopPropagation()">
+                <button class="qty-btn" onclick="changeQty('individual', -1)" aria-label="Restar entrada">−</button>
                 <span class="qty-value" id="qty-individual">0</span>
-                <button class="qty-btn" onclick="changeQty('individual', 1)">+</button>
+                <button class="qty-btn" onclick="changeQty('individual', 1)" aria-label="Sumar entrada">+</button>
               </div>
             </div>
           </div>
 
-
-
-
-
+          <!-- Barra Inferior de Total -->
           <div class="total-bar">
             <div>
-              <p class="total-label">Total</p>
+              <p class="total-label">Total a abonar</p>
               <p class="total-value" id="totalDisplay">$0</p>
             </div>
-            <button class="btn btn-primary" id="nextBtn" onclick="goToStep('details')">
-              Siguiente ›
+            <button class="btn btn-primary" id="nextBtn" onclick="goToStep('details')" disabled style="opacity: 0.5;">
+              Siguiente: Datos del Grupo ›
             </button>
           </div>
         </div>
 
-        <!-- STEP 2: Details -->
+        <!-- PASO 2: Datos de Contacto y Asistentes -->
         <div class="step-section" id="step-details">
           <div style="display:flex; align-items:center; gap:16px; margin-bottom:24px;">
-            <button class="back-link" onclick="goToStep('selection')">← Volver</button>
-            <h2 class="step-title" style="margin-bottom:0">2. Datos del Grupo</h2>
+            <button class="back-link" onclick="goToStep('selection')">← Volver a Entradas</button>
+            <h2 class="step-title" style="margin-bottom:0">2. Datos de Contacto y Asistentes</h2>
           </div>
 
           <form id="detailsForm" onsubmit="submitDetails(event)">
+            <!-- Bloque de Contacto del Comprador -->
             <div class="form-section" style="margin-bottom:24px">
-              <div class="form-group" style="margin-bottom:0">
-                <label class="form-label">📍 Nombre de la iglesia a la que asistes</label>
+              <p class="form-section-title">📱 Datos del Comprador (Titular de Pago)</p>
+              <p class="form-section-sub">Te enviaremos el comprobante oficial y los enlaces de acceso por estos medios.</p>
+              
+              <div class="form-group">
+                <label class="form-label" for="buyerEmail">✉️ Email del Comprador (Obligatorio)</label>
+                <input type="email" class="form-input" id="buyerEmail" placeholder="ejemplo@correo.com" required autocomplete="email" />
+              </div>
+
+              <div class="form-group" style="margin-bottom:0;">
+                <label class="form-label" for="buyerPhone">📱 Celular / WhatsApp con código de área (Obligatorio)</label>
+                <input type="tel" class="form-input" id="buyerPhone" placeholder="Ej: 3364123456" required autocomplete="tel" />
+              </div>
+            </div>
+
+            <!-- Bloque de Iglesia y Pastor -->
+            <div class="form-section" style="margin-bottom:24px">
+              <p class="form-section-title">📍 Iglesia o Congregación</p>
+              
+              <div class="form-group">
+                <label class="form-label" for="cityInput">Nombre de la iglesia / Ciudad</label>
                 <input class="form-input" id="cityInput" placeholder="Ej: Buenos Aires - Iglesia Central" required />
               </div>
-              <div class="form-group" style="margin-bottom:0; margin-top:16px;">
-                <label class="form-label">👤 Nombre de tu pastor</label>
+
+              <div class="form-group" style="margin-bottom:0;">
+                <label class="form-label" for="pastorInput">👤 Nombre de tu Pastor</label>
                 <input class="form-input" id="pastorInput" placeholder="Ej: Pastor Juan" required />
               </div>
             </div>
 
+            <!-- Bloque de Asistentes Dinámicos -->
             <div style="margin-bottom:24px">
-              <p class="form-section-title">Nombres de los Asistentes</p>
-              <p class="form-section-sub">Asegúrate de agregar a todas las personas del grupo debajo:</p>
-              <div id="mixedWarning" style="display:none; background:#fff7ed; border:3px solid #f97316; padding:24px; border-radius:16px; margin-bottom:24px; font-size:16px; color:#9a3412; box-shadow:0 4px 12px rgba(249, 115, 22, 0.15);">
-                ⚠️ <strong style="font-size:18px;">AVISO IMPORTANTE:</strong><br>
-                Estás pagando entradas <strong>Individuales</strong> y de <strong>Matrimonio</strong> juntas. <br>
-                Asegúrate de completar los nombres de todos los asistentes correctamente debajo.
-              </div>
+              <p class="form-section-title">👥 Nombres de los Asistentes</p>
+              <p class="form-section-sub">Completá los nombres y apellidos para la acreditación oficial de cada persona:</p>
               <div id="namesContainer"></div>
             </div>
 
             <div style="padding-top:16px; border-top:1px solid var(--border); display:flex; justify-content:flex-end">
               <button type="submit" class="btn btn-primary"
-                style="padding:20px 48px; border-radius:var(--radius); font-size:16px; box-shadow: 0 8px 24px var(--primary-glow);">
-                Ver Resumen ›
+                style="padding:18px 48px; border-radius:var(--radius); font-size:16px; box-shadow: 0 8px 24px var(--primary-glow);">
+                Ver Resumen de Compra ›
               </button>
             </div>
           </form>
         </div>
 
-        <!-- STEP 3: Payment -->
+        <!-- PASO 3: Resumen y Pasarela de Pago -->
         <div class="step-section" id="step-payment">
-          <div class="center" style="padding:16px 0;">
-            <div class="summary-icon">🔗</div>
+          <div class="center" style="padding:12px 0;">
+            <div class="summary-icon">✨</div>
             <h2 class="step-title">Resumen de Compra</h2>
 
             <div class="summary-card" id="summaryContent"></div>
 
-            <p class="mp-note">Al hacer clic en el botón, serás redirigido a Mercado Pago para completar tu pago de
-              forma segura.</p>
+            <p class="mp-note">
+              Al hacer clic en el botón, serás redirigido a <strong>Mercado Pago</strong> para completar tu pago de
+              forma 100% segura y encriptada.
+            </p>
 
             <div class="btn-container">
-              <button class="btn btn-mp" onclick="goToPayment()">
+              <button class="btn btn-mp" id="payBtn" onclick="goToPayment()">
                 Pagar con Mercado Pago 🔗
               </button>
             </div>
-            <button class="edit-link" onclick="goToStep('details')">Editar datos</button>
+            <button class="edit-link" onclick="goToStep('details')">← Editar datos y asistentes</button>
           </div>
         </div>
       </div>
@@ -875,68 +916,68 @@
   </div>
 
   <script>
-    // ===== CONFIGURATION =====
+    // ===== CONFIGURACIÓN OFICIAL DE PRECIOS =====
     const TICKET_TYPES = {
-      individual: { label: "Individual", price: 29990, maxQty: 10, promo: false },
-      matrimonio: { label: "Matrimonio", price: 70000, maxQty: 5, promo: false },
+      individual: { label: "Individual / General", price: 29990, maxQty: 20 }
     };
 
-    // ===== STATE =====
-    let quantities = { individual: 0, matrimonio: 0 };
-    let activeType = "individual";
+    // Google Apps Script Web App URL
+    const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxY_-vU0TYkPd-D-Fcyy8x2qeSr86hua-US4_kNMKkjZwKb-JDu19fzgp2Woh33Qlns/exec";
+    const SECURITY_TOKEN = "GRAN_REY_SECURE_2026";
+
+    // ===== ESTADO =====
+    let quantities = { individual: 0 };
     let currentStep = "selection";
     let formData = null;
 
+    // ===== SANITIZACIÓN XSS =====
+    function escapeHtml(str) {
+      return String(str || "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+    }
+
     // ===== HELPERS =====
-    function getTicket(type) { return TICKET_TYPES[type || activeType]; }
-    function getNameSlots() { 
-      return (quantities.individual) + (quantities.matrimonio * 2); 
-    }
-    function getTotalPrice() { 
-      return (quantities.individual * TICKET_TYPES.individual.price) + 
-             (quantities.matrimonio * TICKET_TYPES.matrimonio.price); 
+    function getTotalPrice() {
+      return (quantities.individual || 0) * TICKET_TYPES.individual.price;
     }
 
-    function formatPrice(n) { return "$" + n.toLocaleString("es-AR"); }
+    function formatPrice(n) {
+      return "$" + Number(n).toLocaleString("es-AR");
+    }
 
-    // ===== UI UPDATES =====
+    // ===== ACTUALIZACIÓN DE UI =====
     function updateUI() {
-      // Update ticket cards
+      // Tarjeta de ticket
       document.querySelectorAll(".ticket-card").forEach(card => {
         const type = card.dataset.type;
-        const qty = quantities[type];
+        const qty = quantities[type] || 0;
         const isSelected = qty > 0;
         card.classList.toggle("selected", isSelected);
-        
-        // Update internal quantity display
+
         const valSpan = card.querySelector(".qty-value");
         if (valSpan) valSpan.textContent = qty;
-        
-        // Disable minus if 0
+
         const minusBtn = card.querySelector(".qty-btn:first-child");
         if (minusBtn) minusBtn.disabled = qty <= 0;
       });
 
-      // Update total
+      // Total a abonar
       const total = getTotalPrice();
       document.getElementById("totalDisplay").textContent = formatPrice(total);
 
-      // Update Selection Summary and Next Button
-      const totalQty = quantities.individual + quantities.matrimonio;
+      // Resumen del carrito y botón Siguiente
+      const totalQty = quantities.individual;
       const summaryDiv = document.getElementById("selectionSummary");
       const summaryText = document.getElementById("summaryText");
       const nextBtn = document.getElementById("nextBtn");
 
       if (totalQty > 0) {
         summaryDiv.style.display = "flex";
-        let html = "";
-        if (quantities.matrimonio > 0) {
-          html += `<div>${quantities.matrimonio} Matrimonio(s) = ${formatPrice(quantities.matrimonio * TICKET_TYPES.matrimonio.price)}</div>`;
-        }
-        if (quantities.individual > 0) {
-          html += `<div>${quantities.individual} Individual(es) = ${formatPrice(quantities.individual * TICKET_TYPES.individual.price)}</div>`;
-        }
-        summaryText.innerHTML = html;
+        summaryText.innerHTML = `<div>• <strong>${quantities.individual}</strong> Entrada(s) Individual / General = ${formatPrice(quantities.individual * TICKET_TYPES.individual.price)}</div>`;
         nextBtn.disabled = false;
         nextBtn.style.opacity = "1";
       } else {
@@ -945,27 +986,32 @@
         nextBtn.style.opacity = "0.5";
       }
 
-      // Update progress
+      // Progreso
       const pct = currentStep === "selection" ? "33%" : currentStep === "details" ? "66%" : "100%";
       document.getElementById("progressBar").style.width = pct;
 
-      // Show/hide reset button
+      // Botón de reinicio
       document.getElementById("resetBtn").style.display = currentStep !== "selection" ? "flex" : "none";
 
-      // Step visibility
+      // Visibilidad de pasos
       document.querySelectorAll(".step-section").forEach(s => s.classList.remove("active"));
-      document.getElementById("step-" + currentStep).classList.add("active");
+      const activeEl = document.getElementById("step-" + currentStep);
+      if (activeEl) activeEl.classList.add("active");
     }
 
     function selectType(type) {
-      if (quantities[type] === 0) quantities[type] = 1;
+      if ((quantities[type] || 0) === 0) {
+        quantities[type] = 1;
+      }
       updateUI();
     }
 
     function changeQty(type, delta) {
-      const newQ = quantities[type] + delta;
-      if (newQ < 0 || newQ > getTicket(type).maxQty) return;
-      
+      const current = quantities[type] || 0;
+      const max = TICKET_TYPES[type]?.maxQty || 20;
+      const newQ = current + delta;
+      if (newQ < 0 || newQ > max) return;
+
       quantities[type] = newQ;
       updateUI();
     }
@@ -978,61 +1024,60 @@
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
+    // ===== RENDERIZADO DINÁMICO DE INPUTS DE ASISTENTES =====
     function renderNameInputs() {
       const container = document.getElementById("namesContainer");
       container.innerHTML = "";
-      
-      // Show warning if mixed
-      const isMixed = quantities.individual > 0 && quantities.matrimonio > 0;
-      document.getElementById("mixedWarning").style.display = isMixed ? "block" : "none";
 
-      let index = 0;
-
-      // Group Matrimonios
-      if (quantities.matrimonio > 0) {
-        container.innerHTML += `<p class="form-section-title" style="margin: 16px 0 8px; text-align: left; color: var(--accent); font-size:14px; border-bottom:1px solid var(--accent); padding-bottom:4px;">Matrimonios:</p>`;
-        for (let i = 0; i < quantities.matrimonio; i++) {
-          renderInput(container, index++, `Matrimonio #${i + 1} - Persona A`);
-          renderInput(container, index++, `Matrimonio #${i + 1} - Persona B`);
-        }
-      }
-
-      // Group Individuales
-      if (quantities.individual > 0) {
-        if (quantities.matrimonio > 0) {
-          container.innerHTML += `<p class="form-section-title" style="margin: 24px 0 8px; text-align: left; color: var(--accent); font-size:14px; border-bottom:1px solid var(--accent); padding-bottom:4px;">Individuales:</p>`;
-        }
-        for (let i = 0; i < quantities.individual; i++) {
-          renderInput(container, index++, `Persona #${i + 1}`);
-        }
+      for (let i = 0; i < quantities.individual; i++) {
+        renderInput(container, i, `Asistente #${i + 1}`);
       }
     }
 
     function renderInput(container, i, label) {
-      const saved = formData?.names?.[i] || "";
+      const saved = (formData && formData.names && formData.names[i]) ? formData.names[i] : "";
+      const safeSaved = escapeHtml(saved);
+      const safeLabel = escapeHtml(label);
+
       container.innerHTML += `
         <div class="form-group">
-          <label class="form-label" style="font-size:10px; letter-spacing:1px;">${label}</label>
-          <input class="form-input name-input" placeholder="Nombre y apellido completo"
-            value="${saved}" required style="padding:18px 24px; font-size:17px;" />
+          <label class="form-label" style="font-size:11px; letter-spacing:1px;">${safeLabel}</label>
+          <input class="form-input name-input" placeholder="Nombre y apellido completo del asistente"
+            value="${safeSaved}" required style="padding:16px 22px; font-size:16px;" autocomplete="name" />
         </div>
       `;
     }
 
+    // ===== VALIDACIÓN Y ENVÍO DE FORMULARIO =====
     function submitDetails(e) {
       e.preventDefault();
+
+      const buyerEmail = document.getElementById("buyerEmail").value.trim();
+      const buyerPhone = document.getElementById("buyerPhone").value.trim();
       const city = document.getElementById("cityInput").value.trim();
       const pastor = document.getElementById("pastorInput").value.trim();
       const nameInputs = document.querySelectorAll(".name-input");
       const names = [];
       let valid = true;
 
-      nameInputs.forEach(input => {
-        const v = input.value.trim();
-        if (v.length < 3) { input.classList.add("error"); valid = false; }
-        else { input.classList.remove("error"); names.push(v); }
-      });
+      // Validación Email
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!buyerEmail || !emailRegex.test(buyerEmail)) {
+        document.getElementById("buyerEmail").classList.add("error");
+        valid = false;
+      } else {
+        document.getElementById("buyerEmail").classList.remove("error");
+      }
 
+      // Validación Teléfono
+      if (buyerPhone.length < 6) {
+        document.getElementById("buyerPhone").classList.add("error");
+        valid = false;
+      } else {
+        document.getElementById("buyerPhone").classList.remove("error");
+      }
+
+      // Validación Iglesia
       if (city.length < 2) {
         document.getElementById("cityInput").classList.add("error");
         valid = false;
@@ -1040,6 +1085,7 @@
         document.getElementById("cityInput").classList.remove("error");
       }
 
+      // Validación Pastor
       if (pastor.length < 2) {
         document.getElementById("pastorInput").classList.add("error");
         valid = false;
@@ -1047,129 +1093,158 @@
         document.getElementById("pastorInput").classList.remove("error");
       }
 
-      if (!valid) return;
+      // Validación Nombres
+      nameInputs.forEach(input => {
+        const v = input.value.trim();
+        if (v.length < 3) {
+          input.classList.add("error");
+          valid = false;
+        } else {
+          input.classList.remove("error");
+          names.push(v);
+        }
+      });
 
-      formData = { city, pastor, names };
+      if (!valid) {
+        alert("Por favor completá todos los campos obligatorios con datos válidos.");
+        return;
+      }
+
+      formData = { buyerEmail, buyerPhone, city, pastor, names };
       goToStep("payment");
     }
 
-    function escapeHtml(str) {
-      return String(str || "")
-        .replace(/&/g, "&amp;")
-        .replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;")
-        .replace(/"/g, "&quot;")
-        .replace(/'/g, "&#039;");
-    }
-
+    // ===== RESUMEN DEL PASO 3 =====
     function renderSummary() {
       if (!formData) return;
-      let namesHtml = formData.names.map((n, i) =>
+
+      const namesHtml = formData.names.map((n, i) =>
         `<div class="name-item"><strong>${i + 1}.</strong> ${escapeHtml(n)}</div>`
       ).join("");
 
-      let typesText = [];
-      if (quantities.individual > 0) typesText.push(`<strong>${quantities.individual}</strong> Individual(es)`);
-      if (quantities.matrimonio > 0) typesText.push(`<strong>${quantities.matrimonio}</strong> Matrimonio(s)`);
-
       document.getElementById("summaryContent").innerHTML = `
-        <p class="city">Grupo de ${escapeHtml(formData.city)}</p>
-        <p class="entries">${typesText.join(" y ")}</p>
-        <div class="summary-names">${namesHtml}</div>
-        <p class="total-line">Total: ${formatPrice(getTotalPrice())}</p>
+        <div class="contact-line"><strong>📧 Comprador:</strong> ${escapeHtml(formData.buyerEmail)} | <strong>Tel:</strong> ${escapeHtml(formData.buyerPhone)}</div>
+        <p class="city">📍 Iglesia / Grupo: <strong>${escapeHtml(formData.city)}</strong> (Pastor: ${escapeHtml(formData.pastor)})</p>
+        <p class="entries">🎟️ Entradas: <strong>${quantities.individual}</strong> Entrada(s) Individual / General</p>
+        <div class="summary-names">
+          <div style="font-size:12px; font-weight:700; color:var(--primary); margin-bottom:6px; text-transform:uppercase;">Asistentes registrados:</div>
+          ${namesHtml}
+        </div>
+        <div class="total-line">
+          <span>Total a Pagar:</span>
+          <span>${formatPrice(getTotalPrice())}</span>
+        </div>
       `;
     }
 
+    // ===== CHECKOUT ATÓMICO CON MERCADO PAGO =====
     async function goToPayment() {
-      // Save data to localStorage for the post-payment page
+      if (!formData) return;
+
+      const externalRef = "LUM-" + Date.now() + "-" + Math.floor(1000 + Math.random() * 9000);
+      const totalAmount = getTotalPrice();
+      const typeLabel = "Individual / General";
+
+      // Guardar en sessionStorage y localStorage bajo la clave 'ticketflow_purchase'
       const purchaseData = {
-        quantities: { ...quantities },
-        typeLabel: (quantities.individual > 0 && quantities.matrimonio > 0) ? "Mixta (Indiv. + Matrim.)" : (quantities.individual > 0 ? "Individual" : "Matrimonio"),
-        totalPrice: getTotalPrice(),
+        external_reference: externalRef,
+        quantities: { individual: quantities.individual },
+        quantity: quantities.individual,
+        typeLabel: typeLabel,
+        totalPrice: totalAmount,
         city: formData.city,
         pastor: formData.pastor,
+        buyerEmail: formData.buyerEmail,
+        buyerPhone: formData.buyerPhone,
         names: formData.names,
-        timestamp: new Date().toISOString(),
+        timestamp: new Date().toISOString()
       };
+
+      sessionStorage.setItem("ticketflow_purchase", JSON.stringify(purchaseData));
       localStorage.setItem("ticketflow_purchase", JSON.stringify(purchaseData));
 
-      // --- CONFIGURACIÓN DE URL DE GOOGLE SCRIPT ---
-      const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxY_-vU0TYkPd-D-Fcyy8x2qeSr86hua-US4_kNMKkjZwKb-JDu19fzgp2Woh33Qlns/exec";
-
-      // 1. Generar un ID único para esta transacción (External Reference)
-      const externalRef = "EXT-" + Date.now() + "-" + Math.floor(Math.random() * 1000);
-      const dateStr = new Date().toLocaleDateString("es-AR") + " " + new Date().toLocaleTimeString("es-AR", { hour: '2-digit', minute: '2-digit' });
-
-      const typesList = [];
-      for (let i = 0; i < quantities.individual; i++) typesList.push("Individual");
-      for (let i = 0; i < quantities.matrimonio; i++) {
-        typesList.push("Matrimonio");
-        typesList.push("Matrimonio");
+      const btn = document.getElementById("payBtn");
+      if (btn) {
+        btn.innerHTML = 'Procesando pago seguro... ⏳';
+        btn.style.pointerEvents = 'none';
+        btn.style.opacity = '0.7';
       }
 
-      const rows = purchaseData.names.map((name, i) => ({
-        fecha: dateStr,
-        nombre: name,
-        ciudad: purchaseData.city,
-        pastor: purchaseData.pastor,
-        tipo: typesList[i],
-        cantidad: 1,
-        monto: (typesList[i] === "Individual" ? TICKET_TYPES.individual.price : TICKET_TYPES.matrimonio.price / 2),
-      }));
-
       try {
-        const btn = document.querySelector(".btn-mp");
-        if (btn) {
-          btn.innerHTML = 'Procesando pago... ⏳';
-          btn.style.pointerEvents = 'none';
-        }
-
-        // 2. Enviar datos de registro al Excel con el ID de referencia
-        await fetch(GOOGLE_SCRIPT_URL, {
-          method: "POST",
-          mode: "no-cors",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ rows, external_reference: externalRef, token: "GRAN_REY_SECURE_2026" }),
-        });
-
-        // 3. Crear Preferencia de Pago en Mercado Pago vía Google Script
+        // Disparar ÚNICA llamada atómica 'checkout_atomico'
         const response = await fetch(GOOGLE_SCRIPT_URL, {
           method: "POST",
           headers: { "Content-Type": "text/plain" },
           body: JSON.stringify({
-            action: "create_preference",
-            token: "GRAN_REY_SECURE_2026",
+            action: "checkout_atomico",
+            token: SECURITY_TOKEN,
             data: {
               external_reference: externalRef,
-              typeLabel: purchaseData.typeLabel,
-              totalPrice: purchaseData.totalPrice
+              quantities: { individual: quantities.individual },
+              quantity: quantities.individual,
+              city: formData.city,
+              pastor: formData.pastor,
+              buyerEmail: formData.buyerEmail,
+              buyerPhone: formData.buyerPhone,
+              names: formData.names,
+              totalPrice: totalAmount,
+              typeLabel: typeLabel
             }
-          }),
+          })
         });
 
-        const prefData = await response.json();
-        
-        if (prefData.init_point) {
-          // 4. Redirigir al Link de Pago dinámico (Modo compatible)
-          window.location.href = prefData.init_point;
+        const resData = await response.json();
+
+        if (resData && resData.init_point) {
+          // Redirección inmediata a Mercado Pago
+          window.location.href = resData.init_point;
         } else {
-          throw new Error("No se pudo obtener el link de pago.");
+          throw new Error(resData?.error || "No se pudo obtener el link de pago oficial.");
         }
 
       } catch (err) {
-        console.error("Error en el proceso de pago:", err);
-        alert("Hubo un error al conectar con Mercado Pago o el Script de Google. Verifica la consola.");
-        const btn = document.querySelector(".btn-mp");
+        console.error("Error en llamada de checkout atómico:", err);
+
+        // Fallback de contingencia retrocompatible en caso de script Google previo sin actualizar
+        try {
+          console.warn("Intentando fallback secundario de creación de preferencia...");
+          const fbResponse = await fetch(GOOGLE_SCRIPT_URL, {
+            method: "POST",
+            headers: { "Content-Type": "text/plain" },
+            body: JSON.stringify({
+              action: "create_preference",
+              token: SECURITY_TOKEN,
+              data: {
+                external_reference: externalRef,
+                typeLabel: typeLabel,
+                totalPrice: totalAmount
+              }
+            })
+          });
+          const fbData = await fbResponse.json();
+          if (fbData && fbData.init_point) {
+            window.location.href = fbData.init_point;
+            return;
+          }
+        } catch (fbErr) {
+          console.error("Fallo de contingencia:", fbErr);
+        }
+
+        alert("Hubo un error al conectar con la pasarela de pago. Por favor verificá tu conexión o intentá nuevamente.");
         if (btn) {
           btn.innerHTML = 'Pagar con Mercado Pago 🔗';
           btn.style.pointerEvents = 'all';
+          btn.style.opacity = '1';
         }
       }
     }
 
+    // ===== REINICIO TOTAL =====
     function resetAll() {
-      quantities = { individual: 0, matrimonio: 0 };
+      quantities = { individual: 0 };
       formData = null;
+      document.getElementById("buyerEmail").value = "";
+      document.getElementById("buyerPhone").value = "";
       document.getElementById("cityInput").value = "";
       document.getElementById("pastorInput").value = "";
       const container = document.getElementById("namesContainer");
@@ -1178,7 +1253,16 @@
       goToStep("selection");
     }
 
-    // Init
+    // ===== DESREGISTRO DE SERVICE WORKER RESIDUAL =====
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.getRegistrations().then(registrations => {
+        for (let registration of registrations) {
+          registration.unregister();
+        }
+      });
+    }
+
+    // Inicializar UI
     updateUI();
   </script>
 </body>

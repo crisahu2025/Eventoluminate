@@ -1,2 +1,6 @@
 .gemini/
 SCRIPT_LUMINATE_COPIAR.txt
+.vercel/
+.env*
+.DS_Store
+Thumbs.db
