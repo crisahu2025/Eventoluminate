@@ -13,8 +13,11 @@
   <meta property="og:description" content="Adquiere tus entradas para EVENTO LUMINATE." />
   <meta property="og:type" content="website" />
 
-  <!-- Meta tags de seguridad -->
+  <!-- Meta tags de seguridad y control de caché -->
   <meta http-equiv="X-Content-Type-Options" content="nosniff" />
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+  <meta http-equiv="Pragma" content="no-cache" />
+  <meta http-equiv="Expires" content="0" />
   <meta http-equiv="Content-Security-Policy"
     content="default-src 'self' 'unsafe-inline' 'unsafe-eval' https: data: blob:; font-src 'self' https://fonts.gstatic.com https://cdnjs.cloudflare.com data:; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com; img-src 'self' data: https: blob:; connect-src 'self' https:;" />
 
@@ -908,6 +911,7 @@
                 Pagar con Mercado Pago 🔗
               </button>
             </div>
+            <div id="paymentStatusBox" style="margin: 12px 0; font-size: 14px; display: none;"></div>
             <button class="edit-link" onclick="goToStep('details')">← Editar datos y asistentes</button>
           </div>
         </div>
@@ -1164,17 +1168,27 @@
       localStorage.setItem("ticketflow_purchase", JSON.stringify(purchaseData));
 
       const btn = document.getElementById("payBtn");
+      const statusBox = document.getElementById("paymentStatusBox");
+
       if (btn) {
-        btn.innerHTML = 'Procesando pago seguro... ⏳';
+        btn.innerHTML = 'Conectando con Mercado Pago... ⏳';
         btn.style.pointerEvents = 'none';
-        btn.style.opacity = '0.7';
+        btn.style.opacity = '0.75';
       }
+      if (statusBox) {
+        statusBox.style.display = 'block';
+        statusBox.innerHTML = '<span style="color:var(--primary); font-size:13px; font-weight:600;">✨ Registrando tus entradas y preparando pasarela segura...</span>';
+      }
+
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 20000);
 
       try {
         // Disparar ÚNICA llamada atómica 'checkout_atomico'
         const response = await fetch(GOOGLE_SCRIPT_URL, {
           method: "POST",
           headers: { "Content-Type": "text/plain" },
+          signal: controller.signal,
           body: JSON.stringify({
             action: "checkout_atomico",
             token: SECURITY_TOKEN,
@@ -1193,9 +1207,24 @@
           })
         });
 
+        clearTimeout(timeoutId);
         const resData = await response.json();
 
         if (resData && resData.init_point) {
+          if (btn) {
+            btn.innerHTML = '¡Redirigiendo a Mercado Pago! 🚀';
+          }
+          if (statusBox) {
+            statusBox.style.display = 'block';
+            statusBox.innerHTML = `
+              <div style="background:rgba(255,140,90,0.15); border:1px solid #ff8c5a; border-radius:10px; padding:12px; margin-top:8px; text-align:center;">
+                <p style="margin:0 0 8px 0; color:#f5c842; font-weight:700; font-size:13px;">Si no fuiste redirigido automáticamente en 3 segundos:</p>
+                <a href="${resData.init_point}" target="_top" style="display:inline-block; background:linear-gradient(135deg, #ff8c5a, #b07aff); color:#1a0f1e; font-weight:800; padding:10px 20px; border-radius:8px; text-decoration:none; font-size:14px; box-shadow:0 4px 12px rgba(255,140,90,0.4);">
+                  👉 Abrir Mercado Pago Manualmente
+                </a>
+              </div>
+            `;
+          }
           // Redirección inmediata a Mercado Pago
           window.location.href = resData.init_point;
         } else {
@@ -1203,36 +1232,21 @@
         }
 
       } catch (err) {
-        console.error("Error en llamada de checkout atómico:", err);
+        clearTimeout(timeoutId);
+        console.error("Error en llamada de checkout:", err);
 
-        // Fallback de contingencia retrocompatible en caso de script Google previo sin actualizar
-        try {
-          console.warn("Intentando fallback secundario de creación de preferencia...");
-          const fbResponse = await fetch(GOOGLE_SCRIPT_URL, {
-            method: "POST",
-            headers: { "Content-Type": "text/plain" },
-            body: JSON.stringify({
-              action: "create_preference",
-              token: SECURITY_TOKEN,
-              data: {
-                external_reference: externalRef,
-                typeLabel: typeLabel,
-                totalPrice: totalAmount
-              }
-            })
-          });
-          const fbData = await fbResponse.json();
-          if (fbData && fbData.init_point) {
-            window.location.href = fbData.init_point;
-            return;
-          }
-        } catch (fbErr) {
-          console.error("Fallo de contingencia:", fbErr);
+        if (statusBox) {
+          statusBox.style.display = 'block';
+          statusBox.innerHTML = `
+            <div style="background:rgba(255,60,60,0.15); border:1px solid #ff4d4d; border-radius:8px; padding:12px; color:#ffb3b3; text-align:left;">
+              <p style="margin:0; font-weight:700; font-size:13px;">⚠️ No pudimos conectar con la pasarela de pago.</p>
+              <p style="margin:4px 0 0; font-size:12px; color:#ddd;">Por favor verificá tu conexión a internet o hacé clic en reintentar.</p>
+            </div>
+          `;
         }
 
-        alert("Hubo un error al conectar con la pasarela de pago. Por favor verificá tu conexión o intentá nuevamente.");
         if (btn) {
-          btn.innerHTML = 'Pagar con Mercado Pago 🔗';
+          btn.innerHTML = 'Reintentar Pago con Mercado Pago 🔄';
           btn.style.pointerEvents = 'all';
           btn.style.opacity = '1';
         }
