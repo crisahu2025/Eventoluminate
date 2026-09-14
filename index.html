@@ -725,6 +725,15 @@
       }
     }
 
+    @keyframes spin {
+      from {
+        transform: rotate(0deg);
+      }
+      to {
+        transform: rotate(360deg);
+      }
+    }
+
     /* Mobile adjustments */
     @media (max-width: 767px) {
       .ticket-grid {
@@ -1136,9 +1145,66 @@
       `;
     }
 
+    // ===== REPORTE VISUAL DE ERRORES EN PASARELA =====
+    function showPaymentError({ title, message, detail, hint }) {
+      const statusBox = document.getElementById("paymentStatusBox");
+      const btn = document.getElementById("payBtn");
+
+      if (statusBox) {
+        statusBox.style.display = "block";
+        const safeTitle = escapeHtml(title || "Error en la pasarela de pago");
+        const safeMsg = escapeHtml(message || "Ocurrió un inconveniente al procesar la solicitud.");
+        const safeDetail = detail ? escapeHtml(detail) : "";
+        const safeHint = hint ? escapeHtml(hint) : "";
+
+        statusBox.innerHTML = `
+          <div style="background: rgba(244, 63, 94, 0.12); border: 1px solid rgba(244, 63, 94, 0.45); border-radius: var(--radius-sm); padding: 18px 20px; text-align: left; margin: 16px 0; backdrop-filter: blur(12px); box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4); animation: fadeIn 0.3s ease;">
+            <div style="display: flex; align-items: flex-start; gap: 14px;">
+              <div style="font-size: 26px; line-height: 1; flex-shrink: 0;">⚠️</div>
+              <div style="flex: 1; min-width: 0;">
+                <h4 style="font-family: var(--font-heading); color: #ff8c8c; font-size: 17px; font-weight: 700; margin: 0 0 6px; letter-spacing: 0.5px;">
+                  ${safeTitle}
+                </h4>
+                <p style="font-family: var(--font-sans); color: #ffe4e6; font-size: 13px; line-height: 1.5; margin: 0 0 8px;">
+                  ${safeMsg}
+                </p>
+                ${safeDetail ? `
+                  <div style="background: rgba(0, 0, 0, 0.45); border-left: 3px solid #f43f5e; padding: 8px 12px; border-radius: 6px; font-family: monospace; font-size: 12px; color: #fecdd3; word-break: break-word; margin: 8px 0;">
+                    <strong>Detalle técnico:</strong> ${safeDetail}
+                  </div>
+                ` : ""}
+                ${safeHint ? `
+                  <p style="font-family: var(--font-sans); color: var(--gold); font-size: 12px; margin: 8px 0 0; line-height: 1.4;">
+                    💡 <strong>Sugerencia:</strong> ${safeHint}
+                  </p>
+                ` : ""}
+                <div style="margin-top: 12px; padding-top: 10px; border-top: 1px solid rgba(255, 255, 255, 0.08); font-size: 12px; color: var(--muted); display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px;">
+                  <span>💾 Tus datos siguen intactos. Podés reintentar ahora mismo.</span>
+                  <button type="button" onclick="goToPayment()" style="background: rgba(255, 140, 90, 0.2); border: 1px solid var(--primary); color: var(--text); padding: 6px 14px; border-radius: 6px; font-size: 12px; font-weight: 600; cursor: pointer; transition: all 0.2s;">
+                    Reintentar ahora 🔄
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        `;
+      }
+
+      if (btn) {
+        btn.innerHTML = 'Reintentar Pago con Mercado Pago 🔄';
+        btn.style.pointerEvents = 'all';
+        btn.style.opacity = '1';
+        btn.disabled = false;
+      }
+    }
+
     // ===== CHECKOUT ATÓMICO CON MERCADO PAGO =====
     async function goToPayment() {
-      if (!formData) return;
+      if (!formData) {
+        alert("Por favor completá los datos del formulario antes de continuar.");
+        goToStep("details");
+        return;
+      }
 
       const externalRef = "LUM-" + Date.now() + "-" + Math.floor(1000 + Math.random() * 9000);
       const totalAmount = getTotalPrice();
@@ -1159,8 +1225,12 @@
         timestamp: new Date().toISOString()
       };
 
-      sessionStorage.setItem("ticketflow_purchase", JSON.stringify(purchaseData));
-      localStorage.setItem("ticketflow_purchase", JSON.stringify(purchaseData));
+      try {
+        sessionStorage.setItem("ticketflow_purchase", JSON.stringify(purchaseData));
+        localStorage.setItem("ticketflow_purchase", JSON.stringify(purchaseData));
+      } catch (storageErr) {
+        console.warn("No se pudo persistir en storage local:", storageErr);
+      }
 
       const btn = document.getElementById("payBtn");
       const statusBox = document.getElementById("paymentStatusBox");
@@ -1169,17 +1239,30 @@
         btn.innerHTML = 'Conectando con Mercado Pago... ⏳';
         btn.style.pointerEvents = 'none';
         btn.style.opacity = '0.75';
+        btn.disabled = true;
       }
       if (statusBox) {
         statusBox.style.display = 'block';
-        statusBox.innerHTML = '<span style="color:var(--primary); font-size:13px; font-weight:600;">Registrando tus entradas y preparando pasarela segura...</span>';
+        statusBox.innerHTML = `
+          <div style="background: rgba(255, 140, 90, 0.1); border: 1px solid rgba(255, 140, 90, 0.3); border-radius: var(--radius-sm); padding: 14px 18px; margin: 16px 0; animation: fadeIn 0.3s ease;">
+            <div style="display: flex; align-items: center; justify-content: center; gap: 10px; color: var(--primary);">
+              <span style="font-size: 18px; display: inline-block; animation: spin 1s linear infinite;">⏳</span>
+              <span style="font-size: 13px; font-weight: 600;">Registrando tus entradas y preparando pasarela segura...</span>
+            </div>
+          </div>
+        `;
       }
+
+      // Timeout preventivo con AbortController (35s para tolerar arranques fríos de Apps Script)
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 35000);
 
       try {
         // Disparar ÚNICA llamada atómica 'checkout_atomico'
         const response = await fetch(GOOGLE_SCRIPT_URL, {
           method: "POST",
           headers: { "Content-Type": "text/plain" },
+          signal: controller.signal,
           body: JSON.stringify({
             action: "checkout_atomico",
             token: SECURITY_TOKEN,
@@ -1198,39 +1281,117 @@
           })
         });
 
-        const resData = await response.json();
+        clearTimeout(timeoutId);
 
+        // Obtener texto plano para analizar si es JSON o HTML
+        const responseText = await response.text();
+
+        // 1. Detectar si el backend respondió HTML (ej: 404 Google Drive, error de permisos, pantalla de Google)
+        const isHtml = /<!DOCTYPE html|<html|<head|<body|<title|404 Not Found/i.test(responseText) || responseText.trim().startsWith("<");
+        if (isHtml || !response.ok) {
+          let detailSnippet = "";
+          const titleMatch = responseText.match(/<title[^>]*>([^<]+)<\/title>/i);
+          if (titleMatch && titleMatch[1]) {
+            detailSnippet = `Respuesta HTML del servidor (${response.status || 200}): "${titleMatch[1].trim()}"`;
+          } else if (response.status && response.status !== 200) {
+            detailSnippet = `Código HTTP ${response.status}: ${response.statusText || "Error en el servidor web"}`;
+          } else {
+            detailSnippet = "El Web App respondió con una página web HTML en lugar de JSON.";
+          }
+
+          showPaymentError({
+            title: "El Web App de Google Apps Script no está respondiendo",
+            message: "El servidor devolvió una página HTML en lugar de procesar los datos (posible error 404 de Google, permisos denegados o implementación desactualizada).",
+            detail: detailSnippet,
+            hint: "Verificá que la URL de Google Apps Script esté activa, que tenga una 'Nueva Implementación' y que el acceso esté configurado en 'Cualquier usuario' (Anyone)."
+          });
+          return;
+        }
+
+        // 2. Intentar parsear JSON
+        let resData = null;
+        try {
+          resData = JSON.parse(responseText);
+        } catch (parseErr) {
+          showPaymentError({
+            title: "Respuesta inesperada del servidor",
+            message: "El servidor de Apps Script respondió con un formato no reconocido:",
+            detail: responseText.trim() || "Respuesta vacía",
+            hint: "Revisá los logs de ejecución en Google Apps Script para diagnosticar la causa."
+          });
+          return;
+        }
+
+        // 3. Evaluar respuesta JSON
         if (resData && resData.init_point) {
           if (btn) {
             btn.innerHTML = '¡Redirigiendo a Mercado Pago! 🚀';
           }
           if (statusBox) {
             statusBox.style.display = 'block';
-            statusBox.innerHTML = '<span style="color:#f5c842; font-size:14px; font-weight:700;">¡Entradas registradas! Redirigiendo a Mercado Pago... 🚀</span>';
+            statusBox.innerHTML = `
+              <div style="background: rgba(245, 200, 66, 0.15); border: 1px solid rgba(245, 200, 66, 0.4); border-radius: var(--radius-sm); padding: 14px 18px; margin: 16px 0; animation: fadeIn 0.3s ease;">
+                <div style="display: flex; align-items: center; justify-content: center; gap: 10px; color: #ffffff;">
+                  <span style="font-size: 20px;">🚀</span>
+                  <span style="font-size: 14px; font-weight: 700; color: #f5c842;">¡Entradas registradas con éxito! Redirigiendo a Mercado Pago...</span>
+                </div>
+              </div>
+            `;
           }
           // Redirección obligatoria y automática inmediata
           window.location.href = resData.init_point;
-        } else {
-          throw new Error(resData?.error || "No se pudo obtener el link de pago oficial.");
+          return;
         }
+
+        // Si es JSON pero no tiene init_point, es un error devuelto explícitamente por el backend
+        const serverError = (resData && (resData.error || resData.message || (resData.status && resData.status !== "ok" ? resData.status : null))) 
+          || (typeof resData === "string" ? resData : JSON.stringify(resData));
+
+        let hint = "Si sos Cristian o administrador, revisá la configuración del backend en Google Apps Script.";
+        const lowerErr = String(serverError).toLowerCase();
+
+        if (lowerErr.includes("token") || lowerErr.includes("autoriz")) {
+          hint = "El token de seguridad (SECURITY_TOKEN) enviado no coincide con el configurado en Google Apps Script.";
+        } else if (lowerErr.includes("hoja") || lowerErr.includes("sheet")) {
+          hint = "No se encontró la pestaña 'Pago-Online' en la planilla de Google Sheets vinculada (SPREADSHEET_ID).";
+        } else if (lowerErr.includes("mercado pago") || lowerErr.includes("preferencia") || lowerErr.includes("link")) {
+          hint = "Verificá que el Access Token de Mercado Pago (MP_ACCESS_TOKEN) esté configurado en las Propiedades del Script de Google Apps Script.";
+        } else if (lowerErr.includes("lock") || lowerErr.includes("bloqueo")) {
+          hint = "El servidor estaba ocupado procesando otra solicitud simultánea. Reintentá en unos segundos.";
+        }
+
+        showPaymentError({
+          title: "Error reportado por el servidor",
+          message: "El servidor procesó la solicitud pero devolvió un error específico:",
+          detail: String(serverError),
+          hint: hint
+        });
 
       } catch (err) {
+        clearTimeout(timeoutId);
         console.error("Error en llamada de checkout:", err);
 
-        if (statusBox) {
-          statusBox.style.display = 'block';
-          statusBox.innerHTML = `
-            <div style="background:rgba(255,60,60,0.15); border:1px solid #ff4d4d; border-radius:8px; padding:12px; color:#ffb3b3; text-align:left;">
-              <p style="margin:0; font-weight:700; font-size:13px;">⚠️ No pudimos conectar con la pasarela de pago.</p>
-              <p style="margin:4px 0 0; font-size:12px; color:#ddd;">Por favor verificá tu conexión a internet o hacé clic en reintentar.</p>
-            </div>
-          `;
-        }
-
-        if (btn) {
-          btn.innerHTML = 'Reintentar Pago con Mercado Pago 🔄';
-          btn.style.pointerEvents = 'all';
-          btn.style.opacity = '1';
+        if (err.name === "AbortError") {
+          showPaymentError({
+            title: "Tiempo de espera agotado",
+            message: "El servidor de Google Apps Script demoró más de 35 segundos en responder.",
+            detail: "La solicitud fue cancelada por límite de tiempo de espera (timeout).",
+            hint: "Google Apps Script puede estar tardando en arrancar. Hacé clic en reintentar."
+          });
+        } else if (typeof navigator !== "undefined" && !navigator.onLine) {
+          showPaymentError({
+            title: "Sin conexión a internet",
+            message: "Tu dispositivo se encuentra sin conexión a internet.",
+            detail: "No fue posible enviar la solicitud al servidor.",
+            hint: "Verificá tu conexión Wi-Fi o datos móviles y hacé clic en reintentar."
+          });
+        } else {
+          showPaymentError({
+            title: "Error de red o conexión",
+            message: "No se pudo comunicar con el Web App de Google Apps Script.",
+            detail: err.message || String(err),
+            hint: "Verificá que tu conexión a internet sea estable o si algún bloqueador de red o VPN interfiere con la solicitud."
+          });
         }
       }
     }
