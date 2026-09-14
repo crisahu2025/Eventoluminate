@@ -1178,16 +1178,10 @@
                     💡 <strong>Sugerencia:</strong> ${safeHint}
                   </p>
                 ` : ""}
-                <div style="margin-top: 12px; padding-top: 10px; border-top: 1px solid rgba(255, 255, 255, 0.08); font-size: 12px; color: var(--muted); display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px;">
-                  <span>💾 Tus datos están guardados en tu navegador.</span>
-                  <div style="display: flex; gap: 8px;">
-                    <button type="button" onclick="window.location.reload(true)" style="background: rgba(245, 200, 66, 0.2); border: 1px solid var(--gold); color: #ffffff; padding: 6px 14px; border-radius: 6px; font-size: 12px; font-weight: 700; cursor: pointer; transition: all 0.2s;">
-                      Recargar página 🔄
-                    </button>
-                    <button type="button" onclick="goToPayment()" style="background: rgba(255, 140, 90, 0.2); border: 1px solid var(--primary); color: var(--text); padding: 6px 14px; border-radius: 6px; font-size: 12px; font-weight: 600; cursor: pointer; transition: all 0.2s;">
-                      Reintentar ahora ⚡
-                    </button>
-                  </div>
+                <div style="margin-top: 12px; padding-top: 10px; border-top: 1px solid rgba(255, 255, 255, 0.08); font-size: 12px; color: var(--muted); display: flex; align-items: center; justify-content: flex-end;">
+                  <button type="button" onclick="goToPayment()" style="background: rgba(255, 140, 90, 0.2); border: 1px solid var(--primary); color: var(--text); padding: 8px 18px; border-radius: 6px; font-size: 13px; font-weight: 700; cursor: pointer; transition: all 0.2s;">
+                    Reintentar ahora 🔄
+                  </button>
                 </div>
               </div>
             </div>
@@ -1424,40 +1418,13 @@
       });
     }
 
-    // Inicializar UI
-    updateUI();
-
-    // ===== RESTAURAR ESTADO PREVIO TRAS RECARGA =====
+    // ===== SIEMPRE INICIAR LIMPIO EN LA PÁGINA PRINCIPAL (PASO 1) =====
     try {
-      const saved = sessionStorage.getItem("ticketflow_purchase") || localStorage.getItem("ticketflow_purchase");
-      if (saved) {
-        const parsed = JSON.parse(saved);
-        if (parsed && (parsed.quantity > 0 || (parsed.quantities && parsed.quantities.individual > 0))) {
-          const q = Number(parsed.quantity || parsed.quantities.individual || 1);
-          quantities.individual = q;
-          if (parsed.buyerEmail) {
-            formData = {
-              buyerEmail: parsed.buyerEmail || "",
-              buyerPhone: parsed.buyerPhone || "",
-              city: parsed.city || "",
-              pastor: parsed.pastor || "",
-              names: parsed.names || []
-            };
-            const emailEl = document.getElementById("buyerEmail");
-            const phoneEl = document.getElementById("buyerPhone");
-            const cityEl = document.getElementById("cityInput");
-            const pastorEl = document.getElementById("pastorInput");
-            if (emailEl) emailEl.value = formData.buyerEmail;
-            if (phoneEl) phoneEl.value = formData.buyerPhone;
-            if (cityEl) cityEl.value = formData.city;
-            if (pastorEl) pastorEl.value = formData.pastor;
-            goToStep("payment");
-          }
-        }
-      }
-    } catch (restoreErr) {
-      console.warn("No se pudo restaurar estado anterior:", restoreErr);
-    }
+      sessionStorage.removeItem("ticketflow_purchase");
+      localStorage.removeItem("ticketflow_purchase");
+    } catch (e) {}
+
+    resetAll();
   </script>
 </body>
 
