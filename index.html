@@ -828,6 +828,16 @@
                 <span class="qty-value" id="qty-individual">0</span>
                 <button class="qty-btn" onclick="changeQty('individual', 1)" aria-label="Sumar entrada">+</button>
               </div>
+
+              <!-- Aviso destacado Anti-Confusión -->
+              <div style="margin-top:16px; background:rgba(255, 140, 90, 0.1); border:1px solid rgba(255, 140, 90, 0.35); border-radius:var(--radius-sm); padding:10px 14px; text-align:center;">
+                <p style="font-size:12px; font-weight:700; color:var(--gold); margin:0; letter-spacing:0.5px;">
+                  🎟️ 1 ENTRADA = 1 PERSONA / 1 PULSERA
+                </p>
+                <p style="font-size:11px; color:var(--muted); margin:4px 0 0; line-height:1.3;">
+                  Si van a asistir en pareja o grupo, aumentá la cantidad con el botón (+).
+                </p>
+              </div>
             </div>
           </div>
 
@@ -885,7 +895,7 @@
             <!-- Bloque de Asistentes Dinámicos -->
             <div style="margin-bottom:24px">
               <p class="form-section-title">👥 Nombres de los Asistentes</p>
-              <p class="form-section-sub">Completá los nombres y apellidos para la acreditación oficial de cada persona:</p>
+              <p class="form-section-sub">Completá el nombre y apellido para cada entrada (máx. 21 letras, 1 sola persona por entrada):</p>
               <div id="namesContainer"></div>
             </div>
 
@@ -1042,18 +1052,66 @@
       }
     }
 
+    // ===== DETECCIÓN EN TIEMPO REAL DE DOBLE PERSONA / CARACTERES =====
+    const MULTI_PERSON_REGEX = /\b(y|e|con)\b|[&/,+]/i;
+
     function renderInput(container, i, label) {
-      const saved = (formData && formData.names && formData.names[i]) ? formData.names[i] : "";
+      const saved = (formData && formData.names && formData.names[i]) ? formData.names[i].slice(0, 21) : "";
       const safeSaved = escapeHtml(saved);
       const safeLabel = escapeHtml(label);
+      const currentLen = saved.length;
 
       container.innerHTML += `
-        <div class="form-group">
-          <label class="form-label" style="font-size:11px; letter-spacing:1px;">${safeLabel}</label>
-          <input class="form-input name-input" placeholder="Nombre y apellido completo del asistente"
-            value="${safeSaved}" required style="padding:16px 22px; font-size:16px;" autocomplete="name" />
+        <div class="form-group" style="margin-bottom:20px;">
+          <div style="display:flex; justify-content:space-between; align-items:baseline; margin-bottom:6px;">
+            <label class="form-label" for="name-input-${i}" style="font-size:11px; letter-spacing:1px; margin-bottom:0;">
+              👤 ${safeLabel} (1 persona)
+            </label>
+            <span id="counter-${i}" style="font-size:11px; color:var(--muted); font-family:var(--font-num); font-weight:600;">
+              ${currentLen}/21
+            </span>
+          </div>
+          <input 
+            class="form-input name-input" 
+            id="name-input-${i}"
+            placeholder="Ej: Juan Pérez (sin acompañante)"
+            value="${safeSaved}" 
+            maxlength="21"
+            required 
+            style="padding:16px 20px; font-size:15px;" 
+            autocomplete="name"
+            oninput="handleNameInput(this, ${i})"
+          />
+          <div id="error-name-${i}" class="error-text" style="display:none; font-size:12px; line-height:1.4; margin-top:6px; color:#f43f5e; font-weight:600;"></div>
         </div>
       `;
+    }
+
+    function handleNameInput(input, idx) {
+      const val = input.value || "";
+      const countEl = document.getElementById("counter-" + idx);
+      const errorEl = document.getElementById("error-name-" + idx);
+
+      if (countEl) {
+        countEl.textContent = val.length + "/21";
+        countEl.style.color = val.length >= 21 ? "var(--gold)" : "var(--muted)";
+      }
+
+      if (MULTI_PERSON_REGEX.test(val)) {
+        input.classList.add("error");
+        if (errorEl) {
+          errorEl.style.display = "block";
+          errorEl.innerHTML = "⚠️ <strong>Cada entrada es individual para 1 sola persona.</strong> Si asisten 2 personas, volvé al Paso 1 y elegí 2 entradas.";
+        }
+        return false;
+      } else {
+        input.classList.remove("error");
+        if (errorEl) {
+          errorEl.style.display = "none";
+          errorEl.textContent = "";
+        }
+        return true;
+      }
     }
 
     // ===== VALIDACIÓN Y ENVÍO DE FORMULARIO =====
@@ -1067,12 +1125,14 @@
       const nameInputs = document.querySelectorAll(".name-input");
       const names = [];
       let valid = true;
+      let firstErrorInput = null;
 
       // Validación Email
       const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
       if (!buyerEmail || !emailRegex.test(buyerEmail)) {
         document.getElementById("buyerEmail").classList.add("error");
         valid = false;
+        if (!firstErrorInput) firstErrorInput = document.getElementById("buyerEmail");
       } else {
         document.getElementById("buyerEmail").classList.remove("error");
       }
@@ -1081,6 +1141,7 @@
       if (buyerPhone.length < 6) {
         document.getElementById("buyerPhone").classList.add("error");
         valid = false;
+        if (!firstErrorInput) firstErrorInput = document.getElementById("buyerPhone");
       } else {
         document.getElementById("buyerPhone").classList.remove("error");
       }
@@ -1089,6 +1150,7 @@
       if (city.length < 2) {
         document.getElementById("cityInput").classList.add("error");
         valid = false;
+        if (!firstErrorInput) firstErrorInput = document.getElementById("cityInput");
       } else {
         document.getElementById("cityInput").classList.remove("error");
       }
@@ -1097,24 +1159,56 @@
       if (pastor.length < 2) {
         document.getElementById("pastorInput").classList.add("error");
         valid = false;
+        if (!firstErrorInput) firstErrorInput = document.getElementById("pastorInput");
       } else {
         document.getElementById("pastorInput").classList.remove("error");
       }
 
-      // Validación Nombres
-      nameInputs.forEach(input => {
+      // Validación Nombres con Detección Anti-Doble Persona y Límite de 21 caracteres
+      nameInputs.forEach((input, idx) => {
         const v = input.value.trim();
+        const errorEl = document.getElementById("error-name-" + idx);
+
         if (v.length < 3) {
           input.classList.add("error");
+          if (errorEl) {
+            errorEl.style.display = "block";
+            errorEl.textContent = "Por favor completá un nombre válido de al menos 3 letras.";
+          }
           valid = false;
+          if (!firstErrorInput) firstErrorInput = input;
+        } else if (v.length > 21) {
+          input.classList.add("error");
+          if (errorEl) {
+            errorEl.style.display = "block";
+            errorEl.textContent = "El nombre no puede superar los 21 caracteres.";
+          }
+          valid = false;
+          if (!firstErrorInput) firstErrorInput = input;
+        } else if (MULTI_PERSON_REGEX.test(v)) {
+          input.classList.add("error");
+          if (errorEl) {
+            errorEl.style.display = "block";
+            errorEl.innerHTML = "⚠️ <strong>Cada entrada es individual para 1 sola persona.</strong> Si asisten 2 personas, volvé al Paso 1 y elegí 2 entradas.";
+          }
+          valid = false;
+          if (!firstErrorInput) firstErrorInput = input;
         } else {
           input.classList.remove("error");
+          if (errorEl) {
+            errorEl.style.display = "none";
+            errorEl.textContent = "";
+          }
           names.push(v);
         }
       });
 
       if (!valid) {
-        alert("Por favor completá todos los campos obligatorios con datos válidos.");
+        if (firstErrorInput) {
+          firstErrorInput.focus();
+          firstErrorInput.scrollIntoView({ behavior: "smooth", block: "center" });
+        }
+        alert("Por favor revisá los campos: cada entrada es para 1 sola persona (máximo 21 caracteres).");
         return;
       }
 
