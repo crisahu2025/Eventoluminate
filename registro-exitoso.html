@@ -236,6 +236,19 @@
       min-width: 20px;
     }
 
+    .spinner {
+      width: 38px;
+      height: 38px;
+      border: 3px solid rgba(255, 140, 90, 0.2);
+      border-top-color: var(--primary);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
     /* Actions */
     .actions-container {
       display: flex;
@@ -332,6 +345,9 @@
   <div id="qrContainer"></div>
 
   <div class="card">
+    <div style="text-align:center; margin-bottom:12px;">
+      <img src="img/logo_iglesia.png" alt="Iglesia Gran Rey" style="height:56px; width:auto; filter:drop-shadow(0 0 10px rgba(245,200,66,0.35));" />
+    </div>
     <div class="badge-status">✓ PAGO CONFIRMADO</div>
     <div class="success-icon">✨</div>
     <h1>¡REGISTRO EXITOSO!</h1>
@@ -380,44 +396,29 @@
         .replace(/'/g, "&#039;");
     }
 
+    // URL oficial de Google Apps Script Backend
+    const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwTtEm8l6KbzCjvO6wahU7zx9virZZM7El-mwgoTIGChxV7u8tkhaOgyMSTu2IVxaY/exec";
+
     let purchaseData = null;
 
-    // ===== CARGA DE DATOS DESDE STORAGE =====
+    // ===== CARGA DE DATOS DESDE STORAGE LOCAL =====
     function getPurchaseData() {
-      // Intentar primero desde sessionStorage, luego localStorage
       const raw = sessionStorage.getItem("ticketflow_purchase") || localStorage.getItem("ticketflow_purchase");
       if (!raw) return null;
       try {
         return JSON.parse(raw);
       } catch (e) {
-        console.error("Error al parsear datos:", e);
+        console.error("Error al parsear datos locales:", e);
         return null;
       }
     }
 
-    // ===== INICIALIZACIÓN DE PÁGINA =====
-    function init() {
-      // Si hay parámetros en la URL (Mercado Pago redirect)
-      const urlParams = new URLSearchParams(window.location.search);
-      const urlRef = urlParams.get("external_reference");
+    // ===== RENDERIZAR RESUMEN EN UI =====
+    function renderSummary() {
+      if (!purchaseData) return;
 
-      purchaseData = getPurchaseData();
-
-      if (!purchaseData) {
-        document.getElementById("summaryContent").innerHTML = `
-          <p style="color:var(--muted); font-size:13px;">
-            No se encontraron datos locales recientes. Si tu pago fue exitoso mediante Mercado Pago,
-            tu comprobante fue enviado a tu correo electrónico.
-          </p>
-        `;
-        document.getElementById("btnDownload").style.display = "none";
-        document.getElementById("btnWhatsApp").style.display = "none";
-        return;
-      }
-
-      if (urlRef && !purchaseData.external_reference) {
-        purchaseData.external_reference = urlRef;
-      }
+      document.getElementById("btnDownload").style.display = "inline-flex";
+      document.getElementById("btnWhatsApp").style.display = "inline-flex";
 
       const ref = purchaseData.external_reference || ("LUM-" + Date.now());
       const names = Array.isArray(purchaseData.names) ? purchaseData.names : [];
@@ -428,7 +429,6 @@
         : (purchaseData.quantity || (names.length > 0 ? names.length : 1));
       const ticketsLabel = `${qty} Entrada(s) Individual / General`;
 
-      // Renderizar Resumen en UI
       let attendeesHtml = names.map((n, i) =>
         `<div class="attendee-item"><strong>${i + 1}.</strong> <span>${escapeHtml(n)}</span></div>`
       ).join("");
@@ -465,6 +465,97 @@
       document.getElementById("btnWhatsApp").href = `https://wa.me/?text=${waText}`;
     }
 
+    // ===== MOSTRAR ERROR O ESTADO DE NO ENCONTRADO =====
+    function mostrarErrorComprobante(ref, mensaje) {
+      document.getElementById("summaryContent").innerHTML = `
+        <div style="text-align: center; padding: 22px 10px;">
+          <div style="font-size: 36px; margin-bottom: 12px;">⚠️</div>
+          <div style="color: var(--destructive); font-size: 15px; font-weight: 700; margin-bottom: 6px;">
+            No se pudo cargar el comprobante
+          </div>
+          <div style="color: var(--muted); font-size: 13px; line-height: 1.5; margin-bottom: 18px;">
+            ${escapeHtml(mensaje)}
+          </div>
+          <button class="btn btn-secondary" onclick="location.reload()" style="padding: 10px 24px; font-size: 13px; border-radius: 999px; background: rgba(255,255,255,0.08); color: var(--text); border: 1px solid var(--border); cursor: pointer; display: inline-flex; align-items: center; gap: 6px;">
+            🔄 Reintentar
+          </button>
+        </div>
+      `;
+      document.getElementById("btnDownload").style.display = "none";
+      document.getElementById("btnWhatsApp").style.display = "none";
+    }
+
+    // ===== INICIALIZACIÓN INTELIGENTE DE PÁGINA =====
+    async function init() {
+      const urlParams = new URLSearchParams(window.location.search);
+      const urlRef = urlParams.get("external_reference") || urlParams.get("ref");
+      const localData = getPurchaseData();
+
+      // 1. Si viene una referencia en la URL (ej: click desde el correo oficial)
+      if (urlRef) {
+        const cleanUrlRef = urlRef.trim();
+
+        // Si tenemos datos en localStorage y pertenecen exactamente a este comprobante:
+        if (localData && localData.external_reference && localData.external_reference.trim() === cleanUrlRef) {
+          purchaseData = localData;
+          renderSummary();
+          return;
+        }
+
+        // Si no tenemos datos o corresponden a otra compra previa guardada en este equipo:
+        document.getElementById("summaryContent").innerHTML = `
+          <div style="text-align: center; padding: 26px 10px;">
+            <div class="spinner" style="margin: 0 auto 16px;"></div>
+            <div style="color: var(--gold); font-size: 15px; font-weight: 700; margin-bottom: 6px;">
+              Recuperando Comprobante Oficial...
+            </div>
+            <div style="color: var(--muted); font-size: 12.5px;">
+              Buscando registro de compra <strong style="color: var(--primary);">${escapeHtml(cleanUrlRef)}</strong>
+            </div>
+          </div>
+        `;
+        document.getElementById("btnDownload").style.display = "none";
+        document.getElementById("btnWhatsApp").style.display = "none";
+
+        try {
+          const fetchUrl = `${GOOGLE_SCRIPT_URL}?action=consultar_comprobante&ref=${encodeURIComponent(cleanUrlRef)}`;
+          const response = await fetch(fetchUrl);
+          const result = await response.json();
+
+          if (result && result.ok && result.compra) {
+            purchaseData = result.compra;
+            // Guardar en sessionStorage para que sea la compra activa en esta pestaña
+            sessionStorage.setItem("ticketflow_purchase", JSON.stringify(purchaseData));
+            renderSummary();
+            return;
+          } else {
+            console.warn("Comprobante no encontrado en servidor:", result);
+            mostrarErrorComprobante(cleanUrlRef, result?.error || "No encontramos el comprobante solicitado en la base de datos.");
+            return;
+          }
+        } catch (fetchErr) {
+          console.error("Error de conexión al consultar comprobante:", fetchErr);
+          mostrarErrorComprobante(cleanUrlRef, "No pudimos conectar con el servidor oficial. Por favor verificá tu conexión e intentá de nuevo.");
+          return;
+        }
+      }
+
+      // 2. Si no vino parámetro en la URL, mostrar los datos locales recientes si existen
+      if (localData) {
+        purchaseData = localData;
+        renderSummary();
+      } else {
+        document.getElementById("summaryContent").innerHTML = `
+          <p style="color:var(--muted); font-size:13px; text-align:center; padding: 18px 0; line-height: 1.5;">
+            No se encontraron datos locales recientes. Si tu pago fue exitoso mediante Mercado Pago,
+            tu comprobante fue enviado a tu correo electrónico junto con tu PDF y pulsera digital.
+          </p>
+        `;
+        document.getElementById("btnDownload").style.display = "none";
+        document.getElementById("btnWhatsApp").style.display = "none";
+      }
+    }
+
     // ===== GENERACIÓN DE COMPROBANTE OFICIAL EN PDF (VECTORES DIRECTOS) =====
     async function generarPDFComprobante() {
       if (!purchaseData) return;
@@ -485,9 +576,39 @@
         const totalFormatted = Number(purchaseData.totalPrice || 0).toLocaleString("es-AR");
         const names = Array.isArray(purchaseData.names) ? purchaseData.names : [];
 
-        const fechaObj = new Date(purchaseData.timestamp || Date.now());
-        const fechaStr = fechaObj.toLocaleDateString("es-AR", { day: '2-digit', month: '2-digit', year: 'numeric' });
-        const horaStr = fechaObj.toLocaleTimeString("es-AR", { hour: '2-digit', minute: '2-digit' });
+        let fechaStr = "";
+        let horaStr = "";
+        if (purchaseData.fecha && typeof purchaseData.fecha === "string" && purchaseData.fecha.includes("/")) {
+          const parts = purchaseData.fecha.trim().split(" ");
+          fechaStr = parts[0] || "";
+          horaStr = (parts[1] || "") + (parts[2] ? " " + parts[2] : "");
+        } else {
+          const fechaObj = new Date(purchaseData.timestamp || Date.now());
+          const fechaValida = !isNaN(fechaObj.getTime()) ? fechaObj : new Date();
+          fechaStr = fechaValida.toLocaleDateString("es-AR", { day: '2-digit', month: '2-digit', year: 'numeric' });
+          horaStr = fechaValida.toLocaleTimeString("es-AR", { hour: '2-digit', minute: '2-digit' });
+        }
+
+        // Cargar logo de la iglesia para el PDF
+        let logoB64 = null;
+        try {
+          logoB64 = await new Promise((resolve) => {
+            const img = new Image();
+            img.crossOrigin = 'Anonymous';
+            img.onload = () => {
+              const canvas = document.createElement('canvas');
+              canvas.width = img.naturalWidth;
+              canvas.height = img.naturalHeight;
+              const ctx = canvas.getContext('2d');
+              ctx.drawImage(img, 0, 0);
+              resolve(canvas.toDataURL('image/png'));
+            };
+            img.onerror = () => resolve(null);
+            img.src = 'img/logo_iglesia.png?v=2';
+          });
+        } catch (e) {
+          console.warn("Logo no disponible para PDF:", e);
+        }
 
         // 1. Generar Código QR Oficial
         const qrContainer = document.getElementById("qrContainer");
@@ -520,16 +641,27 @@
         doc.setFillColor(26, 15, 30);
         doc.rect(mL, 14, cW, 28, 'F');
 
+        // Dibujar logo de la iglesia si está disponible
+        let titleX = mL + 8;
+        if (logoB64) {
+          try {
+            doc.addImage(logoB64, 'PNG', mL + 4, 16, 24, 24);
+            titleX = mL + 32;
+          } catch (err) {
+            console.warn("Error al incrustar logo en PDF:", err);
+          }
+        }
+
         // Título principal Luminate
         doc.setFont('helvetica', 'bold');
-        doc.setFontSize(20);
+        doc.setFontSize(18);
         doc.setTextColor(255, 255, 255);
-        doc.text('EVENTO LUMINATE', mL + 8, 25);
+        doc.text('EVENTO LUMINATE', titleX, 25);
 
-        doc.setFontSize(9);
+        doc.setFontSize(8.5);
         doc.setFont('helvetica', 'bold');
         doc.setTextColor(255, 140, 90); // Melocotón
-        doc.text('COMPROBANTE OFICIAL DE ENTRADA', mL + 8, 33);
+        doc.text('COMPROBANTE OFICIAL DE ENTRADA', titleX, 33);
 
         // Subtítulo derecho
         doc.setFontSize(8);
@@ -621,8 +753,9 @@
         const qty = (purchaseData.quantities && purchaseData.quantities.individual)
           ? purchaseData.quantities.individual
           : (purchaseData.quantity || (names.length > 0 ? names.length : 1));
-        const unitPrice = 29990;
-        const subtotal = qty * unitPrice;
+        const totalNum = Number(purchaseData.totalPrice || (qty * 29990));
+        const unitPrice = qty > 0 ? Math.round(totalNum / qty) : 29990;
+        const subtotal = totalNum;
 
         const items = [
           {
