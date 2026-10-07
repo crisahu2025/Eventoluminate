@@ -397,7 +397,9 @@
     }
 
     // URL oficial de Google Apps Script Backend
-    const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwTtEm8l6KbzCjvO6wahU7zx9virZZM7El-mwgoTIGChxV7u8tkhaOgyMSTu2IVxaY/exec";
+    const SECURITY_TOKEN = "GRAN_REY_SECURE_2026";
+    const GOOGLE_SCRIPT_BASE_URL = "https://script.google.com/macros/s/AKfycbwTtEm8l6KbzCjvO6wahU7zx9virZZM7El-mwgoTIGChxV7u8tkhaOgyMSTu2IVxaY/exec";
+    const GOOGLE_SCRIPT_URL = GOOGLE_SCRIPT_BASE_URL;
 
     let purchaseData = null;
 
@@ -518,8 +520,13 @@
         document.getElementById("btnWhatsApp").style.display = "none";
 
         try {
-          const fetchUrl = `${GOOGLE_SCRIPT_URL}?action=consultar_comprobante&ref=${encodeURIComponent(cleanUrlRef)}`;
-          const response = await fetch(fetchUrl);
+          const fetchUrl = `${GOOGLE_SCRIPT_BASE_URL}?action=consultar_comprobante&ref=${encodeURIComponent(cleanUrlRef)}&token=${encodeURIComponent(SECURITY_TOKEN)}`;
+          const response = await fetch(fetchUrl, {
+            method: "GET",
+            mode: "cors",
+            credentials: "omit",
+            redirect: "follow"
+          });
           const result = await response.json();
 
           if (result && result.ok && result.compra) {

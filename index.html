@@ -940,8 +940,9 @@
     };
 
     // Google Apps Script Web App URL
-    const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwTtEm8l6KbzCjvO6wahU7zx9virZZM7El-mwgoTIGChxV7u8tkhaOgyMSTu2IVxaY/exec";
     const SECURITY_TOKEN = "GRAN_REY_SECURE_2026";
+    const GOOGLE_SCRIPT_BASE_URL = "https://script.google.com/macros/s/AKfycbwTtEm8l6KbzCjvO6wahU7zx9virZZM7El-mwgoTIGChxV7u8tkhaOgyMSTu2IVxaY/exec";
+    const GOOGLE_SCRIPT_URL = GOOGLE_SCRIPT_BASE_URL + "?token=" + encodeURIComponent(SECURITY_TOKEN);
 
     // ===== ESTADO =====
     let quantities = { individual: 0 };
@@ -1354,6 +1355,9 @@
         // Disparar ÚNICA llamada atómica 'checkout_atomico'
         const response = await fetch(GOOGLE_SCRIPT_URL, {
           method: "POST",
+          mode: "cors",
+          credentials: "omit",
+          redirect: "follow",
           headers: { "Content-Type": "text/plain" },
           signal: controller.signal,
           body: JSON.stringify({
