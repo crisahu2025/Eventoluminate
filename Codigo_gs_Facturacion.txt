@@ -76,17 +76,20 @@ function yaSeEnvioEmail(val) {
 // --- SISTEMA DE ALERTA TEMPRANA POR CORREO A CRISTIAN (CODE AHUMADA) ---
 /**
  * Envía una alerta inmediata a cris.ahu777@gmail.com cuando ocurre un error en el checkout o en la API de pagos.
+ * Prioriza Resend API oficial (UrlFetchApp) para evitar bloqueos de permisos de Google, con fallback a MailApp y GmailApp.
  * Cuenta con un rate-limiter de 3 minutos en caché para evitar saturación de correo.
  */
-function notificarAlertaCristian(titulo, detalle, datosComprador) {
+function notificarAlertaCristian(titulo, detalle, datosComprador, ignorarCache) {
   try {
     const errorKey = Utilities.base64Encode(titulo + (detalle ? detalle.substring(0, 40) : "")).substring(0, 25);
     const cache = CacheService.getScriptCache();
-    if (cache.get("alerta_" + errorKey)) {
+    if (!ignorarCache && cache.get("alerta_" + errorKey)) {
       console.log("Alerta ya enviada recientemente. Omitiendo duplicado: " + titulo);
-      return;
+      return { ok: true, rateLimited: true, message: "Alerta omitida por rate-limit (3 min)" };
     }
-    cache.put("alerta_" + errorKey, "sent", 180); // Rate limit: 3 minutos
+    if (!ignorarCache) {
+      cache.put("alerta_" + errorKey, "sent", 180); // Rate limit: 3 minutos
+    }
 
     const nowStr = Utilities.formatDate(new Date(), "GMT-3", "dd/MM/yyyy HH:mm:ss");
     const asunto = "🚨 ALERTA LUMINATE: " + titulo;
@@ -128,13 +131,71 @@ function notificarAlertaCristian(titulo, detalle, datosComprador) {
       </div>
     `;
 
-    GmailApp.sendEmail(EMAIL_RESPUESTAS, asunto, "ALERTA LUMINATE: " + titulo + "\nDetalle: " + detalle + "\nFecha: " + nowStr, {
-      htmlBody: htmlBody,
-      name: "Guardián Luminate · Alertas"
-    });
-    console.log("Alerta por email enviada exitosamente a " + EMAIL_RESPUESTAS);
+    // 1. CANAL PRIMARIO: Resend API (100% independiente de Google OAuth / Permissions)
+    const resendApiKey = getResendApiKey();
+    if (resendApiKey && resendApiKey.trim() !== "") {
+      try {
+        const payloadResend = {
+          from: "Guardián Luminate <" + EMAIL_FACTURACION + ">",
+          to: [EMAIL_RESPUESTAS],
+          subject: asunto,
+          html: htmlBody,
+          reply_to: EMAIL_RESPUESTAS
+        };
+
+        const res = UrlFetchApp.fetch("https://api.resend.com/emails", {
+          method: "post",
+          contentType: "application/json",
+          headers: { Authorization: "Bearer " + resendApiKey.trim() },
+          payload: JSON.stringify(payloadResend),
+          muteHttpExceptions: true
+        });
+
+        const resCode = res.getResponseCode();
+        const resText = res.getContentText();
+        console.log("Alerta Resend HTTP " + resCode + ": " + resText);
+
+        if (resCode === 200 || resCode === 201) {
+          console.log("Alerta despachada con éxito por Resend a " + EMAIL_RESPUESTAS);
+          return { ok: true, channel: "resend", code: resCode, id: JSON.parse(resText).id || "" };
+        } else {
+          console.warn("Resend devolvió HTTP " + resCode + ": " + resText + ". Probando canal secundario...");
+        }
+      } catch (errResend) {
+        console.error("Error al despachar alerta con Resend API:", errResend);
+      }
+    }
+
+    // 2. CANAL SECUNDARIO: MailApp (Servicio ligero nativo de Apps Script)
+    try {
+      MailApp.sendEmail({
+        to: EMAIL_RESPUESTAS,
+        subject: asunto,
+        htmlBody: htmlBody,
+        name: "Guardián Luminate · Alertas"
+      });
+      console.log("Alerta despachada con éxito mediante MailApp a " + EMAIL_RESPUESTAS);
+      return { ok: true, channel: "mailapp" };
+    } catch (errMail) {
+      console.warn("MailApp no disponible o sin permiso:", errMail);
+    }
+
+    // 3. CANAL TERCIARIO: GmailApp
+    try {
+      GmailApp.sendEmail(EMAIL_RESPUESTAS, asunto, "ALERTA LUMINATE: " + titulo + "\nDetalle: " + detalle + "\nFecha: " + nowStr, {
+        htmlBody: htmlBody,
+        name: "Guardián Luminate · Alertas"
+      });
+      console.log("Alerta despachada con éxito mediante GmailApp a " + EMAIL_RESPUESTAS);
+      return { ok: true, channel: "gmailapp" };
+    } catch (errGmail) {
+      console.error("GmailApp falló al despachar alerta:", errGmail);
+      return { ok: false, error: errGmail.toString() };
+    }
+
   } catch (errAlerta) {
-    console.error("Error al despachar alerta a Cristian:", errAlerta);
+    console.error("Error general al despachar alerta a Cristian:", errAlerta);
+    return { ok: false, error: errAlerta.toString() };
   }
 }
 
@@ -157,7 +218,26 @@ function doGet(e) {
       return jsonOutput(consultarDatosComprobante(e.parameter.ref));
     }
 
-    // 3. Telemetría y reporte de error reportado por cliente vía GET
+    // 3. Prueba de diagnóstico de alerta por email solicitada por administrador
+    if (e.parameter.action === "test_alert" && e.parameter.token === SECURITY_TOKEN) {
+      const resTest = notificarAlertaCristian(
+        "Prueba de Diagnóstico en Vivo",
+        "Esta es una prueba de verificación del Guardián Luminate para comprobar que las alertas por email se entregan correctamente.",
+        {
+          buyerEmail: "cris.ahu777@gmail.com",
+          buyerPhone: "+5493364333287",
+          city: "San Nicolás",
+          pastor: "Cristian Ahumada",
+          names: ["Cristian (Diagnóstico)"],
+          totalPrice: 29990,
+          external_reference: "DIAG-" + Date.now()
+        },
+        true
+      );
+      return jsonOutput({ ok: true, diagnosticResult: resTest });
+    }
+
+    // 4. Telemetría y reporte de error reportado por cliente vía GET
     if (e.parameter.action === "report_client_error") {
       if (e.parameter.token === SECURITY_TOKEN) {
         let errObj = {};
