@@ -6,3 +6,4 @@ SCRIPT_LUMINATE_COPIAR.txt
 Thumbs.db
 
 .vercel
+.env*
