@@ -73,6 +73,71 @@ function yaSeEnvioEmail(val) {
   return s.startsWith("ENVIADO ✅") || s === "ENVIADO" || s === "SI";
 }
 
+// --- SISTEMA DE ALERTA TEMPRANA POR CORREO A CRISTIAN (CODE AHUMADA) ---
+/**
+ * Envía una alerta inmediata a cris.ahu777@gmail.com cuando ocurre un error en el checkout o en la API de pagos.
+ * Cuenta con un rate-limiter de 3 minutos en caché para evitar saturación de correo.
+ */
+function notificarAlertaCristian(titulo, detalle, datosComprador) {
+  try {
+    const errorKey = Utilities.base64Encode(titulo + (detalle ? detalle.substring(0, 40) : "")).substring(0, 25);
+    const cache = CacheService.getScriptCache();
+    if (cache.get("alerta_" + errorKey)) {
+      console.log("Alerta ya enviada recientemente. Omitiendo duplicado: " + titulo);
+      return;
+    }
+    cache.put("alerta_" + errorKey, "sent", 180); // Rate limit: 3 minutos
+
+    const nowStr = Utilities.formatDate(new Date(), "GMT-3", "dd/MM/yyyy HH:mm:ss");
+    const asunto = "🚨 ALERTA LUMINATE: " + titulo;
+
+    let compradorHtml = "";
+    if (datosComprador) {
+      compradorHtml = `
+        <div style="background: rgba(255,255,255,0.08); padding: 14px 16px; border-radius: 8px; margin: 14px 0; border: 1px solid rgba(255,140,90,0.3);">
+          <p style="margin: 4px 0;"><strong>👤 Comprador:</strong> ${datosComprador.buyerEmail || 'No informado'}</p>
+          <p style="margin: 4px 0;"><strong>📱 Teléfono / WhatsApp:</strong> ${datosComprador.buyerPhone || 'No informado'}</p>
+          <p style="margin: 4px 0;"><strong>📍 Ciudad / Pastor:</strong> ${datosComprador.city || '-'} / ${datosComprador.pastor || '-'}</p>
+          <p style="margin: 4px 0;"><strong>👥 Asistentes:</strong> ${Array.isArray(datosComprador.names) ? datosComprador.names.join(', ') : '-'}</p>
+          <p style="margin: 4px 0;"><strong>💰 Total:</strong> $${datosComprador.totalPrice || '-'}</p>
+          <p style="margin: 4px 0;"><strong>📋 Ref:</strong> ${datosComprador.external_reference || '-'}</p>
+        </div>
+      `;
+    }
+
+    const htmlBody = `
+      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; background: #1a0f1e; color: #fff5ee; padding: 24px; border-radius: 12px; border: 2px solid #ef4444;">
+        <div style="border-bottom: 2px solid #ef4444; padding-bottom: 12px; margin-bottom: 16px;">
+          <h2 style="color: #ef4444; margin: 0; font-size: 20px;">🚨 ALERTA AUTOMÁTICA — CHECKOUT LUMINATE</h2>
+          <p style="color: #fca5a5; margin: 6px 0 0; font-size: 13px;">Se reportó una falla en el flujo de pagos. El cliente no pudo completar la operación.</p>
+        </div>
+
+        <div style="background: #2b121e; border: 1px solid #f87171; border-radius: 8px; padding: 14px; margin: 16px 0;">
+          <p style="margin: 0 0 6px; font-weight: bold; color: #fca5a5; font-size: 14px;">Detalle Técnico del Error:</p>
+          <p style="margin: 0; font-family: monospace; font-size: 13px; color: #ffffff; word-break: break-all;">${detalle || titulo}</p>
+        </div>
+
+        <h3 style="color: #ff8c5a; margin: 16px 0 6px; font-size: 15px;">Datos del Cliente Afectado:</h3>
+        ${compradorHtml || '<p style="color:#c4a88a;">No se capturaron datos del formulario para este error.</p>'}
+
+        <div style="background: rgba(255,255,255,0.04); padding: 12px; border-radius: 6px; margin-top: 20px; font-size: 12px; color: #c4a88a;">
+          <p style="margin: 2px 0;">⏱️ <strong>Fecha y Hora:</strong> ${nowStr} (Argentina)</p>
+          <p style="margin: 2px 0;">🌐 <strong>Destinatario de Alerta:</strong> ${EMAIL_RESPUESTAS}</p>
+          <p style="margin: 2px 0;">🛡️ <strong>Origen:</strong> Guardián Automático Code Ahumada</p>
+        </div>
+      </div>
+    `;
+
+    GmailApp.sendEmail(EMAIL_RESPUESTAS, asunto, "ALERTA LUMINATE: " + titulo + "\nDetalle: " + detalle + "\nFecha: " + nowStr, {
+      htmlBody: htmlBody,
+      name: "Guardián Luminate · Alertas"
+    });
+    console.log("Alerta por email enviada exitosamente a " + EMAIL_RESPUESTAS);
+  } catch (errAlerta) {
+    console.error("Error al despachar alerta a Cristian:", errAlerta);
+  }
+}
+
 // --- ENRUTAMIENTO GET ---
 function doGet(e) {
   try {
@@ -92,7 +157,38 @@ function doGet(e) {
       return jsonOutput(consultarDatosComprobante(e.parameter.ref));
     }
 
-    // 3. Health check con token de seguridad
+    // 3. Telemetría y reporte de error reportado por cliente vía GET
+    if (e.parameter.action === "report_client_error") {
+      if (e.parameter.token === SECURITY_TOKEN) {
+        let errObj = {};
+        try { errObj = JSON.parse(e.parameter.error || "{}"); } catch(e){}
+        let formObj = null;
+        try { formObj = JSON.parse(e.parameter.formData || "{}"); } catch(e){}
+        notificarAlertaCristian(
+          errObj.title || "Error reportado por cliente (GET)",
+          (errObj.detail || errObj.message || "Sin detalle") + " | " + (errObj.hint || "") + " | UA: " + (errObj.userAgent || "-"),
+          formObj
+        );
+        return jsonOutput({ ok: true, reported: true });
+      }
+    }
+
+    // 4. Contingencia si un navegador móvil redirige el checkout_atomico a GET
+    if (e.parameter.action === "checkout_atomico") {
+      if (e.parameter.token !== SECURITY_TOKEN) {
+        notificarAlertaCristian("Intento de checkout GET con token inválido", "El token enviado no coincide", null);
+        return jsonOutput({ ok: false, error: "No autorizado: token inválido" });
+      }
+      let getCheckoutData = null;
+      try {
+        getCheckoutData = e.parameter.data ? JSON.parse(e.parameter.data) : null;
+      } catch (errJson) {}
+      if (getCheckoutData) {
+        return ejecutarCheckoutAtomico(getCheckoutData);
+      }
+    }
+
+    // 5. Health check con token de seguridad
     if (e.parameter.token !== SECURITY_TOKEN) {
       return jsonOutput({ ok: false, error: "Acceso denegado: token inválido" });
     }
@@ -224,9 +320,22 @@ function doPost(e) {
       return handleMercadoPagoWebhook(contents);
     }
 
-    // 2. Checkout Atómico (Web oficial: Guarda en Sheets + Crea preferencia MP en 1 sola llamada)
+    // 2. Telemetría y reporte de error reportado por el cliente vía POST
+    if (contents.action === "report_client_error") {
+      if (contents.token === SECURITY_TOKEN) {
+        notificarAlertaCristian(
+          contents.error?.title || "Error reportado por cliente en checkout",
+          (contents.error?.detail || contents.error?.message || "Sin detalle") + " | " + (contents.error?.hint || "") + " | UA: " + (contents.error?.userAgent || "-"),
+          contents.formData || null
+        );
+        return jsonOutput({ ok: true, reported: true });
+      }
+    }
+
+    // 3. Checkout Atómico (Web oficial: Guarda en Sheets + Crea preferencia MP en 1 sola llamada)
     if (contents.action === "checkout_atomico") {
       if (contents.token !== SECURITY_TOKEN) {
+        notificarAlertaCristian("Intento de checkout POST con token inválido", "El token enviado no coincide con SECURITY_TOKEN", contents.data || null);
         return jsonOutput({ ok: false, error: "No autorizado: token inválido" });
       }
       return ejecutarCheckoutAtomico(contents.data);
@@ -323,6 +432,7 @@ function ejecutarCheckoutAtomico(data) {
 
   } catch (err) {
     console.error("Error en checkoutAtomico:", err);
+    notificarAlertaCristian("Falla Crítica en Checkout Atómico", err.toString(), data);
     return jsonOutput({ ok: false, error: "Error al procesar pedido: " + err.toString() });
   } finally {
     lock.releaseLock();
@@ -334,6 +444,12 @@ function invocarMercadoPago(externalRef, typeLabel, totalAmount, quantity, buyer
   const mpToken = getMercadoPagoToken();
   if (!mpToken) {
     console.error("Error: MP_ACCESS_TOKEN no está configurado en ScriptProperties.");
+    notificarAlertaCristian("Mercado Pago: Token Faltante en Servidor", "MP_ACCESS_TOKEN no está configurado en ScriptProperties del servidor.", {
+      external_reference: externalRef,
+      buyerEmail: buyerEmail,
+      buyerPhone: buyerPhone,
+      totalPrice: totalAmount
+    });
     return {
       ok: false,
       error: "El token de Mercado Pago (MP_ACCESS_TOKEN) no está configurado en las ScriptProperties del servidor.",
@@ -417,6 +533,13 @@ function invocarMercadoPago(externalRef, typeLabel, totalAmount, quantity, buyer
     if (prefData && prefData.message) detalleError += " " + prefData.message;
     else if (prefData && prefData.error) detalleError += " " + prefData.error;
 
+    notificarAlertaCristian("Mercado Pago Rechazó Creación de Preferencia (HTTP " + responseCode + ")", detalleError + " | Respuesta MP: " + responseText.substring(0, 300), {
+      external_reference: externalRef,
+      buyerEmail: buyerEmail,
+      buyerPhone: buyerPhone,
+      totalPrice: totalAmount
+    });
+
     return {
       ok: false,
       error: detalleError,
@@ -426,6 +549,12 @@ function invocarMercadoPago(externalRef, typeLabel, totalAmount, quantity, buyer
 
   } catch (fetchErr) {
     console.error("Excepción de red al contactar Mercado Pago:", fetchErr);
+    notificarAlertaCristian("Excepción de Red al contactar Mercado Pago", fetchErr.toString(), {
+      external_reference: externalRef,
+      buyerEmail: buyerEmail,
+      buyerPhone: buyerPhone,
+      totalPrice: totalAmount
+    });
     return {
       ok: false,
       error: "Error de red al conectar con Mercado Pago: " + fetchErr.toString()

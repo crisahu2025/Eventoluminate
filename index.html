@@ -1241,9 +1241,44 @@
     }
 
     // ===== REPORTE VISUAL DE ERRORES EN PASARELA =====
+    // ===== REPORTE VISUAL Y TELEMETRÍA DE ERRORES EN PASARELA =====
     function showPaymentError({ title, message, detail, hint }) {
       const statusBox = document.getElementById("paymentStatusBox");
       const btn = document.getElementById("payBtn");
+
+      // 1. Reporte silencioso y automático por telemetría a Google Apps Script (Alerta a Cristian)
+      try {
+        const errorPayload = {
+          action: "report_client_error",
+          token: SECURITY_TOKEN,
+          error: {
+            title: title || "Error en checkout de cliente",
+            message: message || "",
+            detail: detail || "",
+            hint: hint || "",
+            userAgent: typeof navigator !== "undefined" ? navigator.userAgent : ""
+          },
+          formData: formData ? {
+            buyerEmail: formData.buyerEmail || "",
+            buyerPhone: formData.buyerPhone || "",
+            city: formData.city || "",
+            pastor: formData.pastor || "",
+            names: formData.names || [],
+            totalPrice: typeof getTotalPrice === "function" ? getTotalPrice() : "",
+            quantity: quantities.individual || 1
+          } : null
+        };
+
+        fetch(GOOGLE_SCRIPT_URL, {
+          method: "POST",
+          mode: "cors",
+          credentials: "omit",
+          headers: { "Content-Type": "text/plain" },
+          body: JSON.stringify(errorPayload)
+        }).catch(errSend => console.warn("No se pudo despachar telemetría de error:", errSend));
+      } catch (errTele) {
+        console.warn("Error en despacho de telemetría:", errTele);
+      }
 
       if (statusBox) {
         statusBox.style.display = "block";
@@ -1251,6 +1286,13 @@
         const safeMsg = escapeHtml(message || "Ocurrió un inconveniente al procesar la solicitud.");
         const safeDetail = detail ? escapeHtml(detail) : "";
         const safeHint = hint ? escapeHtml(hint) : "";
+
+        const whatsappMsg = encodeURIComponent(
+          "Hola! Necesito asistencia con el pago de mis entradas para Luminate.\n" +
+          "Comprador: " + (formData?.buyerEmail || "No especificado") + (formData?.buyerPhone ? " (Tel: " + formData.buyerPhone + ")" : "") + "\n" +
+          "Error: " + (title || "Inconveniente al conectar con Mercado Pago")
+        );
+        const whatsappUrl = "https://wa.me/5493364333287?text=" + whatsappMsg;
 
         statusBox.innerHTML = `
           <div style="background: rgba(244, 63, 94, 0.12); border: 1px solid rgba(244, 63, 94, 0.45); border-radius: var(--radius-sm); padding: 18px 20px; text-align: left; margin: 16px 0; backdrop-filter: blur(12px); box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4); animation: fadeIn 0.3s ease;">
@@ -1273,8 +1315,11 @@
                     💡 <strong>Sugerencia:</strong> ${safeHint}
                   </p>
                 ` : ""}
-                <div style="margin-top: 12px; padding-top: 10px; border-top: 1px solid rgba(255, 255, 255, 0.08); font-size: 12px; color: var(--muted); display: flex; align-items: center; justify-content: flex-end;">
-                  <button type="button" onclick="goToPayment()" style="background: rgba(255, 140, 90, 0.2); border: 1px solid var(--primary); color: var(--text); padding: 8px 18px; border-radius: 6px; font-size: 13px; font-weight: 700; cursor: pointer; transition: all 0.2s;">
+                <div style="margin-top: 14px; padding-top: 12px; border-top: 1px solid rgba(255, 255, 255, 0.1); display: flex; flex-wrap: wrap; gap: 10px; align-items: center; justify-content: flex-end;">
+                  <a href="${whatsappUrl}" target="_blank" rel="noopener noreferrer" style="display: inline-flex; align-items: center; gap: 8px; background: #25D366; color: #ffffff; text-decoration: none; padding: 8px 16px; border-radius: 6px; font-size: 13px; font-weight: 700; transition: transform 0.2s, box-shadow 0.2s; box-shadow: 0 4px 12px rgba(37, 211, 102, 0.3);">
+                    <span>💬 Ayuda por WhatsApp</span>
+                  </a>
+                  <button type="button" onclick="goToPayment(false)" style="background: rgba(255, 140, 90, 0.2); border: 1px solid var(--primary); color: var(--text); padding: 8px 18px; border-radius: 6px; font-size: 13px; font-weight: 700; cursor: pointer; transition: all 0.2s;">
                     Reintentar ahora 🔄
                   </button>
                 </div>
@@ -1293,7 +1338,7 @@
     }
 
     // ===== CHECKOUT ATÓMICO CON MERCADO PAGO =====
-    async function goToPayment() {
+    async function goToPayment(isRetry = false) {
       if (!formData) {
         alert("Por favor completá los datos del formulario antes de continuar.");
         goToStep("details");
@@ -1330,7 +1375,7 @@
       const statusBox = document.getElementById("paymentStatusBox");
 
       if (btn) {
-        btn.innerHTML = 'Conectando con Mercado Pago... ⏳';
+        btn.innerHTML = isRetry ? 'Reintentando conexión... ⏳' : 'Conectando con Mercado Pago... ⏳';
         btn.style.pointerEvents = 'none';
         btn.style.opacity = '0.75';
         btn.disabled = true;
@@ -1341,7 +1386,7 @@
           <div style="background: rgba(255, 140, 90, 0.1); border: 1px solid rgba(255, 140, 90, 0.3); border-radius: var(--radius-sm); padding: 14px 18px; margin: 16px 0; animation: fadeIn 0.3s ease;">
             <div style="display: flex; align-items: center; justify-content: center; gap: 10px; color: var(--primary);">
               <span style="font-size: 18px; display: inline-block; animation: spin 1s linear infinite;">⏳</span>
-              <span style="font-size: 13px; font-weight: 600;">Registrando tus entradas y preparando pasarela segura...</span>
+              <span style="font-size: 13px; font-weight: 600;">${isRetry ? 'Reconectando con la pasarela segura (intento 2)...' : 'Registrando tus entradas y preparando pasarela segura...'}</span>
             </div>
           </div>
         `;
@@ -1386,6 +1431,23 @@
         // 1. Detectar si el backend respondió HTML (ej: 404 Google Drive, error de permisos, pantalla de Google)
         const isHtml = /<!DOCTYPE html|<html|<head|<body|<title|404 Not Found/i.test(responseText) || responseText.trim().startsWith("<");
         if (isHtml || !response.ok) {
+          // Si es el primer intento, reintentar automáticamente tras 1.5s
+          if (!isRetry) {
+            console.warn("Respuesta HTML recibida en intento 1. Reintentando automáticamente en 1.5s...");
+            if (statusBox) {
+              statusBox.innerHTML = `
+                <div style="background: rgba(255, 140, 90, 0.15); border: 1px solid rgba(255, 140, 90, 0.4); border-radius: var(--radius-sm); padding: 14px 18px; margin: 16px 0;">
+                  <div style="display: flex; align-items: center; justify-content: center; gap: 10px; color: var(--primary);">
+                    <span style="font-size: 18px; animation: spin 1s linear infinite;">⏳</span>
+                    <span style="font-size: 13px; font-weight: 600;">Estabilizando conexión con el servidor. Reintentando en instantes...</span>
+                  </div>
+                </div>
+              `;
+            }
+            setTimeout(() => goToPayment(true), 1500);
+            return;
+          }
+
           let detailSnippet = "";
           const titleMatch = responseText.match(/<title[^>]*>([^<]+)<\/title>/i);
           if (titleMatch && titleMatch[1]) {
@@ -1398,9 +1460,9 @@
 
           showPaymentError({
             title: "El Web App de Google Apps Script no está respondiendo",
-            message: "El servidor devolvió una página HTML en lugar de procesar los datos (posible error 404 de Google, permisos denegados o implementación desactualizada).",
+            message: "El servidor devolvió una página HTML en lugar de procesar los datos (posible demora de inicio o permisos denegados).",
             detail: detailSnippet,
-            hint: "Verificá que la URL de Google Apps Script esté activa, que tenga una 'Nueva Implementación' y que el acceso esté configurado en 'Cualquier usuario' (Anyone)."
+            hint: "Verificá que la URL de Google Apps Script esté activa y configurada para acceso público (Anyone)."
           });
           return;
         }
@@ -1410,6 +1472,11 @@
         try {
           resData = JSON.parse(responseText);
         } catch (parseErr) {
+          if (!isRetry) {
+            console.warn("JSON parse error en intento 1. Reintentando...");
+            setTimeout(() => goToPayment(true), 1500);
+            return;
+          }
           showPaymentError({
             title: "Respuesta inesperada del servidor",
             message: "El servidor de Apps Script respondió con un formato no reconocido:",
@@ -1468,6 +1535,23 @@
         clearTimeout(timeoutId);
         console.error("Error en llamada de checkout:", err);
 
+        // Si es fallo de red o timeout y aún no se reintentó, hacer retry automático
+        if (!isRetry && (err.name === "AbortError" || (typeof navigator !== "undefined" && navigator.onLine))) {
+          console.warn("Fallo transitorio capturado. Ejecutando reintento silencioso en 1.5s...");
+          if (statusBox) {
+            statusBox.innerHTML = `
+              <div style="background: rgba(255, 140, 90, 0.15); border: 1px solid rgba(255, 140, 90, 0.4); border-radius: var(--radius-sm); padding: 14px 18px; margin: 16px 0;">
+                <div style="display: flex; align-items: center; justify-content: center; gap: 10px; color: var(--primary);">
+                  <span style="font-size: 18px; animation: spin 1s linear infinite;">⏳</span>
+                  <span style="font-size: 13px; font-weight: 600;">Reintentando conexión automáticamente...</span>
+                </div>
+              </div>
+            `;
+          }
+          setTimeout(() => goToPayment(true), 1500);
+          return;
+        }
+
         if (err.name === "AbortError") {
           showPaymentError({
             title: "Tiempo de espera agotado",
@@ -1487,7 +1571,7 @@
             title: "Error de red o conexión",
             message: "No se pudo comunicar con el Web App de Google Apps Script.",
             detail: err.message || String(err),
-            hint: "Verificá que tu conexión a internet sea estable o si algún bloqueador de red o VPN interfiere con la solicitud."
+            hint: "Verificá que tu conexión a internet sea estable o si algún bloqueador de red interfiere con la solicitud."
           });
         }
       }
